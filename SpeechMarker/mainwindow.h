@@ -3,6 +3,12 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QComboBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QVector>
 
 namespace Ui {
 class MainWindow;
@@ -17,8 +23,16 @@ public:
     ~MainWindow();
 
 private:
+    // GIU members:
     Ui::MainWindow *ui;
-    QPushButton *pBtnLoadWav, *pBtnSaveMarkers;
+    QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut;
+    QComboBox   *cBxMarkType, *cBxWindowSize;
+    QLabel      *lbCurrentWavFile;
+    QLineEdit   *edCurrentWavFile;
+    QVBoxLayout *vBoxLayMarksSettings;
+    QHBoxLayout *hBoxLayControlButtons;
+    // Other members:
+    //QVector     *vectSamples, *vectMarks;
 };
 
 #endif // MAINWINDOW_H
