@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
@@ -10,27 +10,43 @@
 #include <QVBoxLayout>
 #include <QVector>
 
-namespace Ui {
-class MainWindow;
-}
+class RenderArea;
 
-class MainWindow : public QMainWindow
+struct wavHeader {
+    quint8 chunkID[4];
+    quint32 chunkSize;
+    quint8 format[4];
+    quint8 subchunk1ID[4];
+    quint32 subchunk1Size;
+    quint16 audioFormat;
+    quint16 numChannels;
+    quint32 sampleRate;
+    quint32 byteRate;
+    quint16 blockAlign;
+    quint16 bitsPerSample;
+    quint8 subchunk2ID[4];
+    quint32 subchunk2Size;
+};
+
+class MainWindow : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+public slots:
+    void pBtnLoadWavClicked();
 
 private:
     // GIU members:
-    Ui::MainWindow *ui;
+    RenderArea  *graphArea;
     QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut;
     QComboBox   *cBxMarkType, *cBxWindowSize;
     QLabel      *lbCurrentWavFile;
     QLineEdit   *edCurrentWavFile;
-    QVBoxLayout *vBoxLayMarksSettings;
-    QHBoxLayout *hBoxLayControlButtons;
+    QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
+    QHBoxLayout *hBoxLayControlButtons, *hBoxLayWavFileLabel, *hBoxLayMain;
     // Other members:
     //QVector     *vectSamples, *vectMarks;
 };
