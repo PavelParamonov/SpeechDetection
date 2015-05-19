@@ -13,10 +13,10 @@
 class RenderArea;
 
 struct wavHeader {
-    quint8 chunkID[4];
+    char chunkID[4];
     quint32 chunkSize;
-    quint8 format[4];
-    quint8 subchunk1ID[4];
+    char format[4];
+    char subchunk1ID[4];
     quint32 subchunk1Size;
     quint16 audioFormat;
     quint16 numChannels;
@@ -24,7 +24,7 @@ struct wavHeader {
     quint32 byteRate;
     quint16 blockAlign;
     quint16 bitsPerSample;
-    quint8 subchunk2ID[4];
+    char subchunk2ID[4];
     quint32 subchunk2Size;
 };
 
@@ -43,8 +43,8 @@ private:
     RenderArea  *graphArea;
     QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut;
     QComboBox   *cBxMarkType, *cBxWindowSize;
-    QLabel      *lbCurrentWavFile;
-    QLineEdit   *edCurrentWavFile;
+    QLabel      *lbCurrentWavFile, *lbWavFileSamplRate, *lbWavFileBitsPerSample;
+    QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample;
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
     QHBoxLayout *hBoxLayControlButtons, *hBoxLayWavFileLabel, *hBoxLayMain;
     // Other members:
