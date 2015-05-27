@@ -5,7 +5,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
-    graphArea = new RenderArea;
+    graphArea = new RenderArea(0);
     pBtnLoadWav = new QPushButton("Load Wav File");
     pBtnSaveMarkers = new QPushButton("Save markers");
     pBtnLoadMarkers = new QPushButton("Load markers");
@@ -59,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent) :
     hBoxLayMain->addLayout(vBoxLayMarksSettings);
     setLayout(hBoxLayMain);
 
+    setWindowTitle("Speech Marker");
+
     connect(pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
 
 }
@@ -66,29 +68,35 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::pBtnLoadWavClicked()
 {
 //    For Windows:
-//    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
-    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
+    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
+//  For Linux:
+    //    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
     QFile wavFile(wavFileName);
-    wavFile.open(QIODevice::ReadOnly);
-    wavHeader wavFileHeader;
-    QDataStream in(&wavFile);
-    in.readRawData(wavFileHeader.chunkID, 4);
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.chunkSize), sizeof(wavFileHeader.chunkSize));
-    in.readRawData(wavFileHeader.format, 4);
-    in.readRawData(wavFileHeader.subchunk1ID, 4);
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk1Size), sizeof(wavFileHeader.subchunk1Size));
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.audioFormat), sizeof(wavFileHeader.audioFormat));
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.numChannels), sizeof(wavFileHeader.numChannels));
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.sampleRate), sizeof(wavFileHeader.sampleRate));
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.byteRate), sizeof(wavFileHeader.byteRate));
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.blockAlign), sizeof(wavFileHeader.blockAlign));
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.bitsPerSample), sizeof(wavFileHeader.bitsPerSample));
-    in.readRawData(wavFileHeader.subchunk2ID, 4);
-    in.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk2Size), sizeof(wavFileHeader.subchunk2Size));
-    wavFile.close();
-    edCurrentWavFile->setText(wavFileName);
-    edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
-    edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
+    if (!wavFile.exists()) {
+        edCurrentWavFile->setText("File doesn't exist");
+    }
+    else {
+      wavFile.open(QIODevice::ReadOnly);
+      wavHeader wavFileHeader;
+      QDataStream inFile(&wavFile);
+      inFile.readRawData(wavFileHeader.chunkID, 4);
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.chunkSize), sizeof(wavFileHeader.chunkSize));
+      inFile.readRawData(wavFileHeader.format, 4);
+      inFile.readRawData(wavFileHeader.subchunk1ID, 4);
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk1Size), sizeof(wavFileHeader.subchunk1Size));
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.audioFormat), sizeof(wavFileHeader.audioFormat));
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.numChannels), sizeof(wavFileHeader.numChannels));
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.sampleRate), sizeof(wavFileHeader.sampleRate));
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.byteRate), sizeof(wavFileHeader.byteRate));
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.blockAlign), sizeof(wavFileHeader.blockAlign));
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.bitsPerSample), sizeof(wavFileHeader.bitsPerSample));
+      inFile.readRawData(wavFileHeader.subchunk2ID, 4);
+      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk2Size), sizeof(wavFileHeader.subchunk2Size));
+      wavFile.close();
+      edCurrentWavFile->setText(wavFileName);
+      edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
+      edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
+    }
 }
 
 MainWindow::~MainWindow()
