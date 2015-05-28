@@ -37,18 +37,19 @@ public:
     ~MainWindow();
 public slots:
     void pBtnLoadWavClicked();
+    void edMarkerPositionTextEdited(const QString &newText);
 
 private:
     // GIU members:
     RenderArea  *graphArea;
     QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut;
     QComboBox   *cBxMarkType, *cBxWindowSize;
-    QLabel      *lbCurrentWavFile, *lbWavFileSamplRate, *lbWavFileBitsPerSample;
-    QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample;
+    QLabel      *lbCurrentWavFile, *lbWavFileSamplRate, *lbWavFileBitsPerSample, *lbMarkerPosition, *lbSamplesInWav;
+    QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample, *edMarkerPosition, *edSamplesInWav;
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
-    QHBoxLayout *hBoxLayControlButtons, *hBoxLayWavFileLabel, *hBoxLayMain;
+    QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain;
     // Other members:
-    //QVector     *vectSamples, *vectMarks;
+    QVector<int>    vectSamples;// *vectMarks;
 };
 
 #endif // MAINWINDOW_H

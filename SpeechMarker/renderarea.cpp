@@ -12,8 +12,9 @@ RenderArea::RenderArea(unsigned int initMarkerPos, QWidget *parent) : QWidget(pa
     pointLeftAxisEnd = new QPoint(0, qFloor(this->height()/2));
     pointRightAxisEnd = new QPoint(this->width(), qFloor(this->height()/2));
     markerPos = initMarkerPos;
-    pointUpperMarkerEnd = new QPoint(qFloor(this->width()/2), 0);
-    pointLowerMarkerEnd = new QPoint(qFloor(this->width()/2), this->height());
+    pointUpperMarkerEnd = new QPoint(0,0);
+    pointLowerMarkerEnd = new QPoint(0,0);
+    maxSampleValue = 1;
 }
 
 RenderArea::~RenderArea()
@@ -36,12 +37,37 @@ QSize RenderArea::minimumSizeHint() const
 {
     return QSize(100,100);
 }
+
+void RenderArea::setNewSamples(const QVector<int> &newVectSamples, unsigned int maxValue)
+{
+    vectSamples.clear();
+    vectSamples = newVectSamples;
+    maxSampleValue = maxValue;
+    yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
+    xScaleSamples = vectSamples.length()/this->width();
+}
+
+void RenderArea::setMarkerPosition(unsigned int newPosition)
+{
+    markerPos = newPosition;
+    pointUpperMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
+    pointUpperMarkerEnd->setY(0);
+    pointLowerMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
+    pointLowerMarkerEnd->setY(this->height());
+}
+
 void RenderArea::resizeEvent(QResizeEvent *event)
 {
     Area->setRect(0,0,this->width(), this->height());
     pointLeftAxisEnd->setY(qFloor(this->height()/2));
     pointRightAxisEnd->setX(this->width());
     pointRightAxisEnd->setY(qFloor(this->height()/2));
+    yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
+    xScaleSamples = vectSamples.length()/this->width();
+    pointUpperMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
+    pointUpperMarkerEnd->setY(0);
+    pointLowerMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
+    pointLowerMarkerEnd->setY(this->height());
 }
 
  void RenderArea::paintEvent(QPaintEvent *event)
@@ -52,4 +78,16 @@ void RenderArea::resizeEvent(QResizeEvent *event)
      painter.drawLine(*pointLeftAxisEnd, *pointRightAxisEnd);
      painter.setPen(*pnMarker);
      painter.drawLine(*pointUpperMarkerEnd, *pointLowerMarkerEnd);
+     painter.setPen(*pnCurve);
+
+//     for(int i=0; (i<this->width()-1) && (vectSamples.length()>0); i++){
+//         QPoint leftEnd(i, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*i)]+this->height()/2);
+//         QPoint rightEnd(i+1, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*(i+1))]+this->height()/2);
+//         painter.drawLine(leftEnd, rightEnd);
+//     }
+     for(int i=0; i<vectSamples.length()-1; i++){
+         QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples.data()[i]+this->height()/2);
+         QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples.data()[i+1]+this->height()/2);
+         painter.drawLine(leftEnd, rightEnd);
+     }
  }
