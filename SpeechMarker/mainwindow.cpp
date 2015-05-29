@@ -100,7 +100,7 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
     unsigned int uIntMarkerPosition = newText.toUInt(&ok);
     if(ok) {
         graphArea->setMarkerPosition(uIntMarkerPosition);
-        graphArea->update();
+//        graphArea->update();
     }
 }
 
@@ -175,7 +175,7 @@ void MainWindow::pBtnLoadWavClicked()
       pBtnPlaceMark->setEnabled(true);
       graphArea->setNewSamples(vectSamples, static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       graphArea->setMarkerPosition(0);
-      graphArea->update();
+//      graphArea->update();
     }
 }
 

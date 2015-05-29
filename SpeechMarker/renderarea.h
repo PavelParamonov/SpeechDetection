@@ -24,7 +24,7 @@ protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *event);
 private:
-//    QPixmap pixmap;
+    QPixmap *pixmap;
     QRect *Area;
     QBrush *brBackground;
     QPen *pnAxis, *pnCurve, *pnMarker;
@@ -32,6 +32,10 @@ private:
     unsigned int markerPos, maxSampleValue;
     QVector<int> vectSamples;
     double xScaleSamples, yScaleSamples;
+    void drawBackground(const QPainter &painter);
+    void drawMarker(const QPainter &painter);
+    void drawAxis(const QPainter &painter);
+    void drawSamples(const QPainter &painter);
 };
 
 #endif // RENDERAREA_H
