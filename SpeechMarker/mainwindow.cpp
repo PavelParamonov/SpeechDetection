@@ -107,9 +107,9 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
 void MainWindow::pBtnLoadWavClicked()
 {
 //    For Windows:
-    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
+//    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
 //  For Linux:
-    //    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
+    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
     QFile wavFile(wavFileName);
     if (!wavFile.exists()) {
         edCurrentWavFile->setText("File doesn't exist");

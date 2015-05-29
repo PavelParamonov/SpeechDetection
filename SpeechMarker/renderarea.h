@@ -32,10 +32,10 @@ private:
     unsigned int markerPos, maxSampleValue;
     QVector<int> vectSamples;
     double xScaleSamples, yScaleSamples;
-    void drawBackground(const QPainter &painter);
-    void drawMarker(const QPainter &painter);
-    void drawAxis(const QPainter &painter);
-    void drawSamples(const QPainter &painter);
+    void drawBackground(QPainter &painter);
+    void drawMarker(QPainter &painter);
+    void drawAxis(QPainter &painter);
+    void drawSamples(QPainter &painter);
 };
 
 #endif // RENDERAREA_H

@@ -39,24 +39,24 @@ QSize RenderArea::minimumSizeHint() const
     return QSize(100,100);
 }
 
-void RenderArea::drawBackground(const QPainter &painter)
+void RenderArea::drawBackground(QPainter &painter)
 {
     painter.fillRect(*Area, *brBackground);
 }
 
-void RenderArea::drawAxis(const QPainter &painter)
+void RenderArea::drawAxis(QPainter &painter)
 {
     painter.setPen(*pnAxis);
     painter.drawLine(*pointLeftAxisEnd, *pointRightAxisEnd);
 }
 
-void RenderArea::drawMarker(const QPainter &painter)
+void RenderArea::drawMarker(QPainter &painter)
 {
     painter.setPen(*pnMarker);
     painter.drawLine(*pointUpperMarkerEnd, *pointLowerMarkerEnd);
 }
 
-void RenderArea::drawSamples(const QPainter &painter)
+void RenderArea::drawSamples(QPainter &painter)
 {
     painter.setPen(*pnCurve);
 //     for(int i=0; (i<this->width()-1) && (vectSamples.length()>0); i++){
@@ -114,6 +114,8 @@ void RenderArea::resizeEvent(QResizeEvent *event)
     pointLowerMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
     pointLowerMarkerEnd->setY(this->height());
 
+    delete pixmap;
+    pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);
     drawBackground(painter);
     drawAxis(painter);
