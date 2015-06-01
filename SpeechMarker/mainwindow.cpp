@@ -90,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Speech Marker");
 
     connect(pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
+    connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
     connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
 
 }
@@ -100,8 +101,19 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
     unsigned int uIntMarkerPosition = newText.toUInt(&ok);
     if(ok) {
         graphArea->setMarkerPosition(uIntMarkerPosition);
-//        graphArea->update();
     }
+}
+
+void MainWindow::pBtnPlaceMarkClicked()
+{
+    pBtnSaveMarkers->setEnabled(true);
+    int markerPosition = edMarkerPosition->text().toInt();
+    graphArea->samplesVectorPtr()->append(markerPosition);
+}
+
+void MainWindow::pBtnSaveMarkersClicked()
+{
+
 }
 
 void MainWindow::pBtnLoadWavClicked()
@@ -139,7 +151,7 @@ void MainWindow::pBtnLoadWavClicked()
                          bytesRead);
       inFile.readRawData(wavFileHeader.subchunk2ID, 4);
       inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk2Size), sizeof(wavFileHeader.subchunk2Size));
-      vectSamples.clear();
+      QVector<int> vectSamples;
       vectSamples.resize(wavFileHeader.subchunk2Size/(wavFileHeader.bitsPerSample/8));
       for(int i=0; i<vectSamples.length();i++) {
           switch (wavFileHeader.bitsPerSample/8) {
@@ -173,9 +185,11 @@ void MainWindow::pBtnLoadWavClicked()
       cBxMarkType->setEnabled(true);
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
+      // Visualise samples:
       graphArea->setNewSamples(vectSamples, static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       graphArea->setMarkerPosition(0);
-//      graphArea->update();
+      // Clear marks array:
+      graphArea->marksVectorPtr()->clear();
     }
 }
 

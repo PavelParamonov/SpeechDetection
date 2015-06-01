@@ -14,8 +14,10 @@ RenderArea::RenderArea(unsigned int initMarkerPos, QWidget *parent) : QWidget(pa
     pointRightAxisEnd = new QPoint(this->width(), qFloor(this->height()/2));
     markerPos = initMarkerPos;
     pointUpperMarkerEnd = new QPoint(0,0);
-    pointLowerMarkerEnd = new QPoint(0,0);
+    pointLowerMarkerEnd = new QPoint(0,this->height());
     maxSampleValue = 1;
+    vectSamples = new QVector<int>();
+    vectMarks = new QVector<int>();
 }
 
 RenderArea::~RenderArea()
@@ -56,6 +58,11 @@ void RenderArea::drawMarker(QPainter &painter)
     painter.drawLine(*pointUpperMarkerEnd, *pointLowerMarkerEnd);
 }
 
+void RenderArea::drawMarks(QPainter &painter)
+{
+
+}
+
 void RenderArea::drawSamples(QPainter &painter)
 {
     painter.setPen(*pnCurve);
@@ -64,20 +71,20 @@ void RenderArea::drawSamples(QPainter &painter)
 //         QPoint rightEnd(i+1, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*(i+1))]+this->height()/2);
 //         painter.drawLine(leftEnd, rightEnd);
 //     }
-    for(int i=0; i<vectSamples.length()-1; i++){
-        QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples.data()[i]+this->height()/2);
-        QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples.data()[i+1]+this->height()/2);
+    for(int i=0; i<vectSamples->length()-1; i++){
+        QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples->data()[i]+this->height()/2);
+        QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples->data()[i+1]+this->height()/2);
         painter.drawLine(leftEnd, rightEnd);
     }
 }
 
 void RenderArea::setNewSamples(const QVector<int> &newVectSamples, unsigned int maxValue)
 {
-    vectSamples.clear();
-    vectSamples = newVectSamples;
+    vectSamples->clear();
+    *vectSamples = newVectSamples;
     maxSampleValue = maxValue;
     yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
-    xScaleSamples = vectSamples.length()/this->width();
+    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
     QPainter painter(pixmap);
     drawBackground(painter);
     drawAxis(painter);
@@ -89,10 +96,10 @@ void RenderArea::setNewSamples(const QVector<int> &newVectSamples, unsigned int 
 void RenderArea::setMarkerPosition(unsigned int newPosition)
 {
     markerPos = newPosition;
-    pointUpperMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
-    pointUpperMarkerEnd->setY(0);
-    pointLowerMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
-    pointLowerMarkerEnd->setY(this->height());
+    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
+    //pointUpperMarkerEnd->setY(0);
+    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
+    //pointLowerMarkerEnd->setY(this->height());
     QPainter painter(pixmap);
     drawBackground(painter);
     drawAxis(painter);
@@ -107,11 +114,11 @@ void RenderArea::resizeEvent(QResizeEvent *event)
     pointLeftAxisEnd->setY(qFloor(this->height()/2));
     pointRightAxisEnd->setX(this->width());
     pointRightAxisEnd->setY(qFloor(this->height()/2));
-    yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
-    xScaleSamples = vectSamples.length()/this->width();
-    pointUpperMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
+    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
+    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
+    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
     pointUpperMarkerEnd->setY(0);
-    pointLowerMarkerEnd->setX(qFloor(markerPos/xScaleSamples));
+    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
     pointLowerMarkerEnd->setY(this->height());
 
     delete pixmap;

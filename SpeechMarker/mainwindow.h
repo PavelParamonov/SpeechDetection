@@ -37,6 +37,8 @@ public:
     ~MainWindow();
 public slots:
     void pBtnLoadWavClicked();
+    void pBtnSaveMarkersClicked();
+    void pBtnPlaceMarkClicked();
     void edMarkerPositionTextEdited(const QString &newText);
 
 private:
@@ -49,7 +51,7 @@ private:
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
     QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain;
     // Other members:
-    QVector<int>    vectSamples;// *vectMarks;
+    //QVector<int>    vectSamples, vectMarks;// *vectMarks;
 };
 
 #endif // MAINWINDOW_H
