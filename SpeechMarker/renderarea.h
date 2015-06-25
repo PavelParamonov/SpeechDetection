@@ -9,15 +9,13 @@ class RenderArea : public QWidget
 {
     Q_OBJECT
 public:
-    explicit RenderArea(unsigned int initMarkerPos, QWidget *parent = 0);
+    explicit RenderArea(const QVector<int> *samples, const QVector<int> *markers, const unsigned int *PtrMarkerPos, QWidget *parent = 0);
     ~RenderArea();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
-    void setNewSamples(const QVector<int> &newVectSamples, unsigned int maxValue);
-    void setMarkerPosition(unsigned int newPosition);
-    QVector<int> *samplesVectorPtr(){return vectSamples;}
-    QVector<int> *marksVectorPtr(){return vectMarks;}
+    void setSampleMaxValue(int v) {maxSampleValue=v;}
+    void updatePlot();
 signals:
 
 public slots:
@@ -31,9 +29,13 @@ private:
     QBrush *brBackground;
     QPen *pnAxis, *pnCurve, *pnMarker;
     QPoint *pointLeftAxisEnd, *pointRightAxisEnd, *pointUpperMarkerEnd, *pointLowerMarkerEnd;
-    unsigned int markerPos, maxSampleValue;
-    QVector<int> *vectSamples, *vectMarks;
+    unsigned int maxSampleValue;
+    const unsigned int *markerPos;
+    // -----------------------------------------
+    const QVector<int> *vectSamples, *vectMarks;
+    // -----------------------------------------
     double xScaleSamples, yScaleSamples;
+    // Drawing functions:
     void drawBackground(QPainter &painter);
     void drawMarker(QPainter &painter);
     void drawAxis(QPainter &painter);

@@ -6,7 +6,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
-    graphArea = new RenderArea(0);
+    markerPosition = 1;
+    graphArea = new RenderArea(&vectSamples, &vectMarks, &markerPosition);
     pBtnLoadWav = new QPushButton("Load Wav File");
     pBtnSaveMarkers = new QPushButton("Save markers");
     pBtnSaveMarkers->setEnabled(false);
@@ -99,16 +100,24 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
 {
     bool ok = false;
     unsigned int uIntMarkerPosition = newText.toUInt(&ok);
-    if(ok) {
-        graphArea->setMarkerPosition(uIntMarkerPosition);
+    if(ok && (uIntMarkerPosition>0) && (uIntMarkerPosition<=vectSamples.length())) {
+        // Set normal color:
+        edMarkerPosition->setStyleSheet("QLineEdit{background: white;}");
+        markerPosition = uIntMarkerPosition;
+        graphArea->updatePlot();
+    }
+    else {
+        // Change color to disturbingly red:
+        edMarkerPosition->setStyleSheet("QLineEdit{background: red;}");
     }
 }
 
 void MainWindow::pBtnPlaceMarkClicked()
 {
     pBtnSaveMarkers->setEnabled(true);
-    int markerPosition = edMarkerPosition->text().toInt();
-    graphArea->samplesVectorPtr()->append(markerPosition);
+//    unsigned int uIntMarkerPosition = edMarkerPosition->text().toInt();
+    vectMarks.append(markerPosition);
+//    graphArea->samplesVectorPtr()->append(markerPosition);
 }
 
 void MainWindow::pBtnSaveMarkersClicked()
@@ -151,7 +160,7 @@ void MainWindow::pBtnLoadWavClicked()
                          bytesRead);
       inFile.readRawData(wavFileHeader.subchunk2ID, 4);
       inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk2Size), sizeof(wavFileHeader.subchunk2Size));
-      QVector<int> vectSamples;
+      vectSamples.clear();
       vectSamples.resize(wavFileHeader.subchunk2Size/(wavFileHeader.bitsPerSample/8));
       for(int i=0; i<vectSamples.length();i++) {
           switch (wavFileHeader.bitsPerSample/8) {
@@ -168,11 +177,14 @@ void MainWindow::pBtnLoadWavClicked()
           }
       }
       wavFile.close();
+      // Type wav file information:
       edCurrentWavFile->setText(wavFileName);
       edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
       edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
       edSamplesInWav->setText(QString::number(vectSamples.length()));
-      edMarkerPosition->setText("0");
+      // Initial marker position:
+      markerPosition = 1;
+      edMarkerPosition->setText("1");
       // Unlock all necessary GUI elements:
       edMarkerPosition->setEnabled(true);
       edSamplesInWav->setEnabled(true);
@@ -185,11 +197,11 @@ void MainWindow::pBtnLoadWavClicked()
       cBxMarkType->setEnabled(true);
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
-      // Visualise samples:
-      graphArea->setNewSamples(vectSamples, static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
-      graphArea->setMarkerPosition(0);
-      // Clear marks array:
-      graphArea->marksVectorPtr()->clear();
+      // Visualize samples:
+      graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
+      graphArea->updatePlot();
+      // Clear all previusly set marks:
+      vectMarks.clear();
     }
 }
 

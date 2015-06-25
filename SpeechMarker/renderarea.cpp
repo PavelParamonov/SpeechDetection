@@ -2,7 +2,7 @@
 #include <QPainter>
 #include <QtMath>
 
-RenderArea::RenderArea(unsigned int initMarkerPos, QWidget *parent) : QWidget(parent)
+RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const unsigned int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), QWidget(parent)
 {
     Area = new QRect(0,0,this->width(), this->height());
     pixmap = new QPixmap(Area->width(), Area->height());
@@ -12,12 +12,9 @@ RenderArea::RenderArea(unsigned int initMarkerPos, QWidget *parent) : QWidget(pa
     pnMarker = new QPen(QColor(200,0,0));
     pointLeftAxisEnd = new QPoint(0, qFloor(this->height()/2));
     pointRightAxisEnd = new QPoint(this->width(), qFloor(this->height()/2));
-    markerPos = initMarkerPos;
     pointUpperMarkerEnd = new QPoint(0,0);
     pointLowerMarkerEnd = new QPoint(0,this->height());
     maxSampleValue = 1;
-    vectSamples = new QVector<int>();
-    vectMarks = new QVector<int>();
 }
 
 RenderArea::~RenderArea()
@@ -55,6 +52,9 @@ void RenderArea::drawAxis(QPainter &painter)
 void RenderArea::drawMarker(QPainter &painter)
 {
     painter.setPen(*pnMarker);
+    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
+    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
+    pointLowerMarkerEnd->setY(this->height());
     painter.drawLine(*pointUpperMarkerEnd, *pointLowerMarkerEnd);
 }
 
@@ -71,41 +71,14 @@ void RenderArea::drawSamples(QPainter &painter)
 //         QPoint rightEnd(i+1, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*(i+1))]+this->height()/2);
 //         painter.drawLine(leftEnd, rightEnd);
 //     }
+    yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
+    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
+
     for(int i=0; i<vectSamples->length()-1; i++){
         QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples->data()[i]+this->height()/2);
         QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples->data()[i+1]+this->height()/2);
         painter.drawLine(leftEnd, rightEnd);
     }
-}
-
-void RenderArea::setNewSamples(const QVector<int> &newVectSamples, unsigned int maxValue)
-{
-    vectSamples->clear();
-    *vectSamples = newVectSamples;
-    maxSampleValue = maxValue;
-    yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
-    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
-    QPainter painter(pixmap);
-    drawBackground(painter);
-    drawAxis(painter);
-    drawMarker(painter);
-    drawSamples(painter);
-    update();
-}
-
-void RenderArea::setMarkerPosition(unsigned int newPosition)
-{
-    markerPos = newPosition;
-    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
-    //pointUpperMarkerEnd->setY(0);
-    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
-    //pointLowerMarkerEnd->setY(this->height());
-    QPainter painter(pixmap);
-    drawBackground(painter);
-    drawAxis(painter);
-    drawMarker(painter);
-    drawSamples(painter);
-    update();
 }
 
 void RenderArea::resizeEvent(QResizeEvent *event)
@@ -116,9 +89,8 @@ void RenderArea::resizeEvent(QResizeEvent *event)
     pointRightAxisEnd->setY(qFloor(this->height()/2));
     yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
     xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
-    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
-    pointUpperMarkerEnd->setY(0);
-    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(markerPos)/xScaleSamples));
+    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
+    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
     pointLowerMarkerEnd->setY(this->height());
 
     delete pixmap;
@@ -128,6 +100,18 @@ void RenderArea::resizeEvent(QResizeEvent *event)
     drawAxis(painter);
     drawMarker(painter);
     drawSamples(painter);
+}
+
+void RenderArea::updatePlot()
+{
+    delete pixmap;
+    pixmap = new QPixmap(Area->width(), Area->height());
+    QPainter painter(pixmap);
+    drawBackground(painter);
+    drawAxis(painter);
+    drawMarker(painter);
+    drawSamples(painter);
+    this->update();
 }
 
  void RenderArea::paintEvent(QPaintEvent *event)
