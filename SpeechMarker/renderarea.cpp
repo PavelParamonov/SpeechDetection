@@ -10,6 +10,7 @@ RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers,
     pnAxis = new QPen(QColor(0,0,0));
     pnCurve = new QPen(QColor(0,0,200));
     pnMarker = new QPen(QColor(200,0,0));
+    pnMarks = new QPen(QColor(0,200,0));
     pointLeftAxisEnd = new QPoint(0, qFloor(this->height()/2));
     pointRightAxisEnd = new QPoint(this->width(), qFloor(this->height()/2));
     pointUpperMarkerEnd = new QPoint(0,0);
@@ -60,7 +61,12 @@ void RenderArea::drawMarker(QPainter &painter)
 
 void RenderArea::drawMarks(QPainter &painter)
 {
-
+    painter.setPen(*pnMarks);
+    for(int i=0; i<vectMarks->length(); i++) {
+        QPoint upperPoint(qFloor(static_cast<double>(vectMarks->data()[i])/xScaleSamples), 0);
+        QPoint lowerPoint(qFloor(static_cast<double>(vectMarks->data()[i])/xScaleSamples),this->height());
+        painter.drawLine(upperPoint, lowerPoint);
+    }
 }
 
 void RenderArea::drawSamples(QPainter &painter)
@@ -97,9 +103,11 @@ void RenderArea::resizeEvent(QResizeEvent *event)
     pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);
     drawBackground(painter);
+    drawBackground(painter);
     drawAxis(painter);
-    drawMarker(painter);
     drawSamples(painter);
+    drawMarks(painter);
+    drawMarker(painter);
 }
 
 void RenderArea::updatePlot()
@@ -108,9 +116,10 @@ void RenderArea::updatePlot()
     pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);
     drawBackground(painter);
-    drawAxis(painter);
-    drawMarker(painter);
+    drawAxis(painter);    
     drawSamples(painter);
+    drawMarks(painter);
+    drawMarker(painter);
     this->update();
 }
 

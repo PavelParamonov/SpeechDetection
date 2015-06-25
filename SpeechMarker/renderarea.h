@@ -27,7 +27,7 @@ private:
     QPixmap *pixmap;
     QRect *Area;
     QBrush *brBackground;
-    QPen *pnAxis, *pnCurve, *pnMarker;
+    QPen *pnAxis, *pnCurve, *pnMarker, *pnMarks;
     QPoint *pointLeftAxisEnd, *pointRightAxisEnd, *pointUpperMarkerEnd, *pointLowerMarkerEnd;
     unsigned int maxSampleValue;
     const unsigned int *markerPos;

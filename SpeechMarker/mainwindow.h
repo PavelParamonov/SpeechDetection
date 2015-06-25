@@ -51,7 +51,7 @@ private:
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
     QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain;
     // Other members:
-    QVector<int>    vectSamples, vectMarks;// *vectMarks;
+    QVector<int>    vectSamples, vectMarks;
     unsigned int markerPosition;
 };
 

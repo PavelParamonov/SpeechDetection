@@ -66,7 +66,6 @@ MainWindow::MainWindow(QWidget *parent) :
     vBoxLayMarksSettings->addWidget(pBtnZoomIn);
     vBoxLayMarksSettings->addWidget(pBtnZoomOut);
     vBoxLayMarksSettings->addWidget(cBxMarkType);
-    vBoxLayMarksSettings->addWidget(cBxWindowSize);
     vBoxLayMarksSettings->addWidget(pBtnPlaceMark);
 
     hBoxLayWavFileLabel = new QHBoxLayout();
@@ -115,9 +114,8 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
 void MainWindow::pBtnPlaceMarkClicked()
 {
     pBtnSaveMarkers->setEnabled(true);
-//    unsigned int uIntMarkerPosition = edMarkerPosition->text().toInt();
-    vectMarks.append(markerPosition);
-//    graphArea->samplesVectorPtr()->append(markerPosition);
+    if(!vectMarks.contains(markerPosition))
+        vectMarks.append(markerPosition);
 }
 
 void MainWindow::pBtnSaveMarkersClicked()
