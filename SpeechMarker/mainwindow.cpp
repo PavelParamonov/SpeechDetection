@@ -100,6 +100,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
     connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
     connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
+    connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
+}
+
+void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
+{
+    markerPosition = newPosition;
+    edMarkerPosition->setText(QString::number(markerPosition));
+    graphArea->updatePlot();
 }
 
 void MainWindow::edMarkerPositionTextEdited(const QString &newText)

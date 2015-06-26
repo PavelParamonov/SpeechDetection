@@ -42,6 +42,7 @@ public slots:
     void pBtnSaveMarkersClicked();
     void pBtnPlaceMarkClicked();
     void edMarkerPositionTextEdited(const QString &newText);
+    void graphAreaMarkerPositionChanged(int newPosition);
 
 private:
     // GIU members:

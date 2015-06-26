@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QVector>
+#include <QMouseEvent>
 
 class RenderArea : public QWidget
 {
@@ -17,12 +18,13 @@ public:
     void setSampleMaxValue(int v) {maxSampleValue=v;}
     void updatePlot();
 signals:
-
+    void markerPositionChanged(int newPosition);
 public slots:
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *event);
+    void mouseReleaseEvent(QMouseEvent * event);
 private:
     QPixmap *pixmap;
     QRect *Area;

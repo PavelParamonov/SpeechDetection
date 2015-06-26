@@ -1,6 +1,7 @@
 #include "renderarea.h"
 #include <QPainter>
 #include <QtMath>
+#include <QVariant>
 
 RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), QWidget(parent)
 {
@@ -127,4 +128,9 @@ void RenderArea::updatePlot()
  {
      QPainter painter(this);
      painter.drawPixmap(0, 0, *pixmap);
+ }
+
+ void RenderArea::mouseReleaseEvent(QMouseEvent * event)
+ {
+    emit markerPositionChanged(qFloor(event->x() * xScaleSamples));
  }
