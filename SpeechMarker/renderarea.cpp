@@ -2,7 +2,7 @@
 #include <QPainter>
 #include <QtMath>
 
-RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const unsigned int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), QWidget(parent)
+RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), QWidget(parent)
 {
     Area = new QRect(0,0,this->width(), this->height());
     pixmap = new QPixmap(Area->width(), Area->height());

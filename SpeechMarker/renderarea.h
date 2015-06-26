@@ -9,7 +9,7 @@ class RenderArea : public QWidget
 {
     Q_OBJECT
 public:
-    explicit RenderArea(const QVector<int> *samples, const QVector<int> *markers, const unsigned int *PtrMarkerPos, QWidget *parent = 0);
+    explicit RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent = 0);
     ~RenderArea();
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
@@ -30,7 +30,7 @@ private:
     QPen *pnAxis, *pnCurve, *pnMarker, *pnMarks;
     QPoint *pointLeftAxisEnd, *pointRightAxisEnd, *pointUpperMarkerEnd, *pointLowerMarkerEnd;
     unsigned int maxSampleValue;
-    const unsigned int *markerPos;
+    const int *markerPos;
     // -----------------------------------------
     const QVector<int> *vectSamples, *vectMarks;
     // -----------------------------------------

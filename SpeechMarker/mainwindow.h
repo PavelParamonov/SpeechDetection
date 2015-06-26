@@ -12,6 +12,8 @@
 
 class RenderArea;
 
+#define defaultLabel "-------?-------"
+
 struct wavHeader {
     char chunkID[4];
     quint32 chunkSize;
@@ -45,14 +47,15 @@ private:
     // GIU members:
     RenderArea  *graphArea;
     QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut;
-    QComboBox   *cBxMarkType, *cBxWindowSize;
+    QComboBox   *cBxMarkType, *cBxWindowSize, *cBxIntervals;
     QLabel      *lbCurrentWavFile, *lbWavFileSamplRate, *lbWavFileBitsPerSample, *lbMarkerPosition, *lbSamplesInWav;
     QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample, *edMarkerPosition, *edSamplesInWav;
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
     QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain;
     // Other members:
     QVector<int>    vectSamples, vectMarks;
-    unsigned int markerPosition;
+    QVector<QString> vectLabels;
+    int markerPosition;
 };
 
 #endif // MAINWINDOW_H

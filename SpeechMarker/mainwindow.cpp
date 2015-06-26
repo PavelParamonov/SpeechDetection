@@ -6,7 +6,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
-    markerPosition = 1;
+    markerPosition = 0;
     graphArea = new RenderArea(&vectSamples, &vectMarks, &markerPosition);
     pBtnLoadWav = new QPushButton("Load Wav File");
     pBtnSaveMarkers = new QPushButton("Save markers");
@@ -34,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent) :
     edMarkerPosition->setEnabled(false);
     lbSamplesInWav = new QLabel("Samples in file:");
     edSamplesInWav = new QLineEdit();
+    cBxIntervals = new QComboBox();
+//    cBxIntervals ->addItem(defaultLabel);
+    cBxIntervals ->setMinimumWidth(120);
+    cBxIntervals->setEnabled(false);
     edSamplesInWav->setEnabled(false);
     edSamplesInWav->setReadOnly(true);
     edWavFileBitsPerSample = new QLineEdit();
@@ -41,8 +45,10 @@ MainWindow::MainWindow(QWidget *parent) :
     edWavFileBitsPerSample->setReadOnly(true);
     edWavFileBitsPerSample->setMaximumWidth(60);
     cBxMarkType = new QComboBox();
+    cBxMarkType->addItem("-------?-------");
     cBxMarkType->addItem("Silence");
     cBxMarkType->addItem("Speech");
+    cBxMarkType->setMinimumWidth(80);
     cBxMarkType->setEnabled(false);
     cBxWindowSize = new QComboBox();
     cBxWindowSize->setEnabled(false);
@@ -56,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
     hBoxLayMarkerPosition ->addWidget(edMarkerPosition);
     hBoxLayMarkerPosition ->addWidget(lbSamplesInWav);
     hBoxLayMarkerPosition ->addWidget(edSamplesInWav);
+    hBoxLayMarkerPosition ->addWidget(cBxIntervals);
+    hBoxLayMarkerPosition-> addWidget(cBxMarkType);
 
     hBoxLayControlButtons = new QHBoxLayout();
     hBoxLayControlButtons->addWidget(pBtnLoadWav);
@@ -65,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     vBoxLayMarksSettings = new QVBoxLayout();
     vBoxLayMarksSettings->addWidget(pBtnZoomIn);
     vBoxLayMarksSettings->addWidget(pBtnZoomOut);
-    vBoxLayMarksSettings->addWidget(cBxMarkType);
+    vBoxLayMarksSettings->addWidget(cBxWindowSize);
     vBoxLayMarksSettings->addWidget(pBtnPlaceMark);
 
     hBoxLayWavFileLabel = new QHBoxLayout();
@@ -92,30 +100,42 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
     connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
     connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
-
 }
 
 void MainWindow::edMarkerPositionTextEdited(const QString &newText)
 {
     bool ok = false;
-    unsigned int uIntMarkerPosition = newText.toUInt(&ok);
-    if(ok && (uIntMarkerPosition>0) && (uIntMarkerPosition<=vectSamples.length())) {
+    int uIntMarkerPosition = newText.toUInt(&ok);
+    if(ok && (uIntMarkerPosition>=0) && (uIntMarkerPosition<vectSamples.length())) {
         // Set normal color:
         edMarkerPosition->setStyleSheet("QLineEdit{background: white;}");
+        // Unlock "Place marker button"
+        pBtnPlaceMark->setEnabled(true);
         markerPosition = uIntMarkerPosition;
         graphArea->updatePlot();
     }
     else {
         // Change color to disturbingly red:
         edMarkerPosition->setStyleSheet("QLineEdit{background: red;}");
+        pBtnPlaceMark->setEnabled(false);
     }
 }
 
 void MainWindow::pBtnPlaceMarkClicked()
 {
     pBtnSaveMarkers->setEnabled(true);
-    if(!vectMarks.contains(markerPosition))
-        vectMarks.append(markerPosition);
+    if(!vectMarks.contains(markerPosition)) {
+        int i=0;
+        while((i<vectMarks.length()) && (markerPosition>vectMarks.data()[i])) {i++;}
+        QString currentIntervalLabel = vectLabels.data()[i];
+        vectLabels.remove(i,1);
+        vectLabels.insert(i, currentIntervalLabel);
+        vectLabels.insert(i, currentIntervalLabel);
+        cBxIntervals->removeItem(i);
+        cBxIntervals->insertItem(i, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(markerPosition));
+        cBxIntervals->insertItem(i+1, QString::number(markerPosition) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i]));
+        vectMarks.insert(i, markerPosition);
+    }
 }
 
 void MainWindow::pBtnSaveMarkersClicked()
@@ -126,9 +146,9 @@ void MainWindow::pBtnSaveMarkersClicked()
 void MainWindow::pBtnLoadWavClicked()
 {
 //    For Windows:
-//    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
+    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
 //  For Linux:
-    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
+//    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
     QFile wavFile(wavFileName);
     if (!wavFile.exists()) {
         edCurrentWavFile->setText("File doesn't exist");
@@ -181,8 +201,8 @@ void MainWindow::pBtnLoadWavClicked()
       edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
       edSamplesInWav->setText(QString::number(vectSamples.length()));
       // Initial marker position:
-      markerPosition = 1;
-      edMarkerPosition->setText("1");
+      markerPosition = 0;
+      edMarkerPosition->setText(QString::number(markerPosition));
       // Unlock all necessary GUI elements:
       edMarkerPosition->setEnabled(true);
       edSamplesInWav->setEnabled(true);
@@ -192,9 +212,15 @@ void MainWindow::pBtnLoadWavClicked()
       edWavFileBitsPerSample->setEnabled(true);
       pBtnZoomIn->setEnabled(true);
       pBtnZoomOut->setEnabled(true);
+      cBxIntervals->setEnabled(true);
       cBxMarkType->setEnabled(true);
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
+      // When wav file is opened we have one interval from begining to the end:
+      cBxIntervals->addItem(QString::number(0) + "-" + QString::number(vectSamples.length()-1));
+      // Add default label that coverl the whole wav:
+      vectLabels.clear();
+      vectLabels.append(defaultLabel);
       // Visualize samples:
       graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       graphArea->updatePlot();
