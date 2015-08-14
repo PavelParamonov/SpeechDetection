@@ -102,8 +102,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
     connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
     //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
-    connect(cBxIntervals, SIGNAL(highlighted(int)), this, SLOT(cBxIntervalsHighlighted(int)));
-    connect(cBxMarkType, SIGNAL(highlighted(QString)), this, SLOT(cBxMarkTypeHighlighted(QString)));
+    connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
+    connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -149,15 +149,17 @@ void MainWindow::pBtnPlaceMarkClicked()
     }
 }
 
-void MainWindow::cBxMarkTypeHighlighted(const QString & text)
+void MainWindow::cBxMarkTypeCurrentIndexChanged(const QString & text)
 {
     int currInterval = cBxIntervals->currentIndex();
     vectLabels[currInterval] = text;
 }
 
-void MainWindow::cBxIntervalsHighlighted(int index)
+void MainWindow::cBxIntervalsCurrentIndexChanged(int index)
 {
-    cBxMarkType->setCurrentIndex(cBxMarkType->findText(vectLabels[index]));
+    if(index != -1) {
+        cBxMarkType->setCurrentIndex(cBxMarkType->findText(vectLabels[index]));
+    }
 }
 
 void MainWindow::pBtnSaveMarkersClicked()
@@ -238,8 +240,6 @@ void MainWindow::pBtnLoadWavClicked()
       cBxMarkType->setEnabled(true);
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
-      // When wav file is opened we have one interval from begining to the end:
-      cBxIntervals->addItem(QString::number(0) + "-" + QString::number(vectSamples.length()-1));
       // Add default label that cover the whole wav:
       vectLabels.clear();
       vectLabels.append(defaultLabel);
@@ -248,6 +248,8 @@ void MainWindow::pBtnLoadWavClicked()
       // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
       vectMarks.append(0);
       vectMarks.append(vectSamples.length()-1);
+      // When wav file is opened we have one interval from begining to the end:
+      cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
       // Visualize samples:
       graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       graphArea->updatePlot();

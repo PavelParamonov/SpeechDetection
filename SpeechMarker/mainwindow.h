@@ -41,8 +41,8 @@ public slots:
     void pBtnLoadWavClicked();
     void pBtnSaveMarkersClicked();
     void pBtnPlaceMarkClicked();
-    void cBxMarkTypeHighlighted(const QString & text);
-    void cBxIntervalsHighlighted(int index);
+    void cBxMarkTypeCurrentIndexChanged(const QString & text);
+    void cBxIntervalsCurrentIndexChanged(int index);
     void edMarkerPositionTextEdited(const QString &newText);
     void graphAreaMarkerPositionChanged(int newPosition);
 
