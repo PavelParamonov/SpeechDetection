@@ -101,6 +101,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
     connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
     connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
+    //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
+    connect(cBxIntervals, SIGNAL(highlighted(int)), this, SLOT(cBxIntervalsHighlighted(int)));
+    connect(cBxMarkType, SIGNAL(highlighted(QString)), this, SLOT(cBxMarkTypeHighlighted(QString)));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -135,15 +138,26 @@ void MainWindow::pBtnPlaceMarkClicked()
     if(!vectMarks.contains(markerPosition)) {
         int i=0;
         while((i<vectMarks.length()) && (markerPosition>vectMarks.data()[i])) {i++;}
-        QString currentIntervalLabel = vectLabels.data()[i];
-        vectLabels.remove(i,1);
+        QString currentIntervalLabel = vectLabels.data()[i-1];  // Because number of labels = (number of marks - 1)
+        vectLabels.remove(i-1,1);
+        vectLabels.insert(i-1, currentIntervalLabel);
         vectLabels.insert(i, currentIntervalLabel);
-        vectLabels.insert(i, currentIntervalLabel);
-        cBxIntervals->removeItem(i);
-        cBxIntervals->insertItem(i, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(markerPosition));
-        cBxIntervals->insertItem(i+1, QString::number(markerPosition) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i]));
+        cBxIntervals->removeItem(i-1);
+        cBxIntervals->insertItem(i-1, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(markerPosition));
+        cBxIntervals->insertItem(i, QString::number(markerPosition) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i]));
         vectMarks.insert(i, markerPosition);
     }
+}
+
+void MainWindow::cBxMarkTypeHighlighted(const QString & text)
+{
+    int currInterval = cBxIntervals->currentIndex();
+    vectLabels[currInterval] = text;
+}
+
+void MainWindow::cBxIntervalsHighlighted(int index)
+{
+    cBxMarkType->setCurrentIndex(cBxMarkType->findText(vectLabels[index]));
 }
 
 void MainWindow::pBtnSaveMarkersClicked()
@@ -226,14 +240,17 @@ void MainWindow::pBtnLoadWavClicked()
       pBtnPlaceMark->setEnabled(true);
       // When wav file is opened we have one interval from begining to the end:
       cBxIntervals->addItem(QString::number(0) + "-" + QString::number(vectSamples.length()-1));
-      // Add default label that coverl the whole wav:
+      // Add default label that cover the whole wav:
       vectLabels.clear();
       vectLabels.append(defaultLabel);
+      // Clear all previusly set marks:
+      vectMarks.clear();
+      // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
+      vectMarks.append(0);
+      vectMarks.append(vectSamples.length()-1);
       // Visualize samples:
       graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       graphArea->updatePlot();
-      // Clear all previusly set marks:
-      vectMarks.clear();
     }
 }
 
