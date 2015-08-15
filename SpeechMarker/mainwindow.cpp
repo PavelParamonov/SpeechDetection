@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     markerPosition = 0;
     graphArea = new RenderArea(&vectSamples, &vectMarks, &markerPosition);
+    graphArea->setEnabled(false);
     pBtnLoadWav = new QPushButton("Load Wav File");
     pBtnSaveMarkers = new QPushButton("Save markers");
     pBtnSaveMarkers->setEnabled(false);
@@ -252,6 +253,7 @@ void MainWindow::pBtnLoadWavClicked()
       cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
       // Visualize samples:
       graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
+      graphArea->setEnabled(true);
       graphArea->updatePlot();
     }
 }
