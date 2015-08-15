@@ -16,6 +16,7 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
     void setSampleMaxValue(int v) {maxSampleValue=v;}
+    void setSelectedInterval(int ind) {selectedInterval=ind;}
     void updatePlot();
 signals:
     void markerPositionChanged(int newPosition);
@@ -29,7 +30,7 @@ private:
     QPixmap *pixmap;
     QRect *Area;
     QBrush *brBackground;
-    QPen *pnAxis, *pnCurve, *pnMarker, *pnMarks;
+    QPen *pnAxis, *pnCurve, *pnCurveSelected, *pnMarker, *pnMarks;
     QPoint *pointLeftAxisEnd, *pointRightAxisEnd, *pointUpperMarkerEnd, *pointLowerMarkerEnd;
     unsigned int maxSampleValue;
     const int *markerPos;
@@ -37,6 +38,7 @@ private:
     const QVector<int> *vectSamples, *vectMarks;
     // -----------------------------------------
     double xScaleSamples, yScaleSamples;
+    int selectedInterval;
     // Drawing functions:
     void drawBackground(QPainter &painter);
     void drawMarker(QPainter &painter);
