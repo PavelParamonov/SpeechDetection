@@ -143,10 +143,10 @@ void MainWindow::pBtnPlaceMarkClicked()
         vectLabels.remove(i-1,1);
         vectLabels.insert(i-1, currentIntervalLabel);
         vectLabels.insert(i, currentIntervalLabel);
-        cBxIntervals->removeItem(i-1);
-        cBxIntervals->insertItem(i-1, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(markerPosition));
-        cBxIntervals->insertItem(i, QString::number(markerPosition) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i]));
         vectMarks.insert(i, markerPosition);
+        cBxIntervals->removeItem(i-1);
+        cBxIntervals->insertItem(i-1, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
+        cBxIntervals->insertItem(i, QString::number(vectMarks.data()[i]) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i+1]));
     }
 }
 
@@ -160,6 +160,8 @@ void MainWindow::cBxIntervalsCurrentIndexChanged(int index)
 {
     if(index != -1) {
         cBxMarkType->setCurrentIndex(cBxMarkType->findText(vectLabels[index]));
+        graphArea->setSelectedInterval(index);
+        graphArea->updatePlot();
     }
 }
 
@@ -225,6 +227,16 @@ void MainWindow::pBtnLoadWavClicked()
       edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
       edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
       edSamplesInWav->setText(QString::number(vectSamples.length()));
+      // Add default label that cover the whole wav:
+      vectLabels.clear();
+      vectLabels.append(defaultLabel);
+      // Clear all previusly set marks:
+      vectMarks.clear();
+      // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
+      vectMarks.append(0);
+      vectMarks.append(vectSamples.length()-1);
+      // When wav file is opened we have one interval from begining to the end:
+      cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
       // Initial marker position:
       markerPosition = 0;
       edMarkerPosition->setText(QString::number(markerPosition));
@@ -241,16 +253,6 @@ void MainWindow::pBtnLoadWavClicked()
       cBxMarkType->setEnabled(true);
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
-      // Add default label that cover the whole wav:
-      vectLabels.clear();
-      vectLabels.append(defaultLabel);
-      // Clear all previusly set marks:
-      vectMarks.clear();
-      // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
-      vectMarks.append(0);
-      vectMarks.append(vectSamples.length()-1);
-      // When wav file is opened we have one interval from begining to the end:
-      cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
       // Visualize samples:
       graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       graphArea->setEnabled(true);

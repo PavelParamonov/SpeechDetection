@@ -3,13 +3,14 @@
 #include <QtMath>
 #include <QVariant>
 
-RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), QWidget(parent)
+RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), selectedInterval(0), QWidget(parent)
 {
     Area = new QRect(0,0,this->width(), this->height());
     pixmap = new QPixmap(Area->width(), Area->height());
     brBackground = new QBrush(QColor(255,255,255));
     pnAxis = new QPen(QColor(0,0,0));
     pnCurve = new QPen(QColor(0,0,200));
+    pnCurveSelected = new QPen(QColor(128,0,128));
     pnMarker = new QPen(QColor(200,0,0));
     pnMarks = new QPen(QColor(0,200,0));
     pointLeftAxisEnd = new QPoint(0, qFloor(this->height()/2));
@@ -72,7 +73,7 @@ void RenderArea::drawMarks(QPainter &painter)
 
 void RenderArea::drawSamples(QPainter &painter)
 {
-    painter.setPen(*pnCurve);
+
 //     for(int i=0; (i<this->width()-1) && (vectSamples.length()>0); i++){
 //         QPoint leftEnd(i, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*i)]+this->height()/2);
 //         QPoint rightEnd(i+1, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*(i+1))]+this->height()/2);
@@ -81,10 +82,33 @@ void RenderArea::drawSamples(QPainter &painter)
     yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
     xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
 
-    for(int i=0; i<vectSamples->length()-1; i++){
-        QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples->data()[i]+this->height()/2);
-        QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples->data()[i+1]+this->height()/2);
-        painter.drawLine(leftEnd, rightEnd);
+    /*  Let's implement drawing in three parts:
+        - draw samples BEFORE selected interval with pen pnCurve;
+        - draw samples INSIDE selected interval with pen pnCurveSelected;
+        - draw sample AFTER selected interval with pen pnCurve;
+    */
+    if(vectSamples->length() > 0) {
+        // Before selected interval:
+        painter.setPen(*pnCurve);
+        for(int i=0; (i<vectMarks->at(selectedInterval)-1); i++){
+            QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples->data()[i]+this->height()/2);
+            QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples->data()[i+1]+this->height()/2);
+            painter.drawLine(leftEnd, rightEnd);
+        }
+        // Inside selected interval:
+        painter.setPen(*pnCurveSelected);
+        for(int i=vectMarks->at(selectedInterval); i<vectMarks->at(selectedInterval+1)-1; i++){
+            QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples->data()[i]+this->height()/2);
+            QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples->data()[i+1]+this->height()/2);
+            painter.drawLine(leftEnd, rightEnd);
+        }
+        // After selected interval:
+        painter.setPen(*pnCurve);
+        for(int i=vectMarks->at(selectedInterval+1); i<vectSamples->length()-1; i++){
+            QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples->data()[i]+this->height()/2);
+            QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples->data()[i+1]+this->height()/2);
+            painter.drawLine(leftEnd, rightEnd);
+        }
     }
 }
 
