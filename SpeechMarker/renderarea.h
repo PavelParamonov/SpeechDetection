@@ -1,12 +1,13 @@
 #ifndef RENDERAREA_H
 #define RENDERAREA_H
 
-#include <QWidget>
+#include <QOpenGLWidget>
 #include <QPixmap>
+//#include <QImage>
 #include <QVector>
 #include <QMouseEvent>
 
-class RenderArea : public QWidget
+class RenderArea : public QOpenGLWidget
 {
     Q_OBJECT
 public:
@@ -28,6 +29,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent * event);
 private:
     QPixmap *pixmap;
+//    QImage *image;
     QRect *Area;
     QBrush *brBackground;
     QPen *pnAxis, *pnCurve, *pnCurveSelected, *pnMarker, *pnMarks;

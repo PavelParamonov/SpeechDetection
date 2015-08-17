@@ -3,10 +3,11 @@
 #include <QtMath>
 #include <QVariant>
 
-RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), selectedInterval(0), QWidget(parent)
+RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), selectedInterval(0), QOpenGLWidget(parent)
 {
     Area = new QRect(0,0,this->width(), this->height());
     pixmap = new QPixmap(Area->width(), Area->height());
+//    image = new QImage(Area->width(), Area->height(), QImage::Format_RGB16);
     brBackground = new QBrush(QColor(255,255,255));
     pnAxis = new QPen(QColor(0,0,0));
     pnCurve = new QPen(QColor(0,0,200));
@@ -74,14 +75,35 @@ void RenderArea::drawMarks(QPainter &painter)
 void RenderArea::drawSamples(QPainter &painter)
 {
 
-//     for(int i=0; (i<this->width()-1) && (vectSamples.length()>0); i++){
-//         QPoint leftEnd(i, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*i)]+this->height()/2);
-//         QPoint rightEnd(i+1, -yScaleSamples*vectSamples.data()[qFloor(xScaleSamples*(i+1))]+this->height()/2);
-//         painter.drawLine(leftEnd, rightEnd);
-//     }
-    yScaleSamples = static_cast<double>(this->height())/maxSampleValue;
+    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
     xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
 
+//     for(int i=0; (i<this->width()-1) && (vectSamples->length()>0); i++){
+//         QPoint leftEnd(i, -yScaleSamples*vectSamples->data()[qFloor(xScaleSamples*i)]+this->height()/2);
+//         QPoint rightEnd(i+1, -yScaleSamples*vectSamples->data()[qFloor(xScaleSamples*(i+1))]+this->height()/2);
+//         painter.drawLine(leftEnd, rightEnd);
+//     }
+//    QPoint leftEnd(0, -yScaleSamples*vectSamples->data()[0]+this->height()/2);
+//    for(int k = 0; k<this->width(); k++) {
+//        QVector<char> listOfValues(maxSampleValue*2, 0);
+//        for(int j=0; j<qFloor(xScaleSamples); j++) {
+//            if(listOfValues[maxSampleValue + vectSamples->data()[k*qFloor(xScaleSamples)+j]] == 0) {
+//                QPoint rightEnd(k, -yScaleSamples*vectSamples->data()[k*qFloor(xScaleSamples)+j]+this->height()/2);
+//                painter.drawLine(leftEnd, rightEnd);
+//                leftEnd = rightEnd;
+//                listOfValues[maxSampleValue + vectSamples->data()[k*qFloor(xScaleSamples)+j]] = 1;
+//            }
+//        }
+//    }
+//    for(int i=0; i<vectSamples->length()-1; i++){
+//        if(i == (qFloor(xScaleSamples*k))) {
+//            QPoint leftEnd(qFloor(i/xScaleSamples), -yScaleSamples*vectSamples->data()[i]+this->height()/2);
+//            QPoint rightEnd(qFloor((i+1)/xScaleSamples), -yScaleSamples*vectSamples->data()[i+1]+this->height()/2);
+//            painter.drawLine(leftEnd, rightEnd);
+//            leftEnd = rightEnd;
+//            k++;
+//        }
+//    }
     /*  Let's implement drawing in three parts:
         - draw samples BEFORE selected interval with pen pnCurve;
         - draw samples INSIDE selected interval with pen pnCurveSelected;
@@ -125,8 +147,11 @@ void RenderArea::resizeEvent(QResizeEvent *event)
     pointLowerMarkerEnd->setY(this->height());
 
     delete pixmap;
+//    delete image;
     pixmap = new QPixmap(Area->width(), Area->height());
+//    image = new QImage(Area->width(), Area->height(), QImage::Format_RGB16);
     QPainter painter(pixmap);
+//    QPainter painter(image);
     drawBackground(painter);
     drawBackground(painter);
     drawAxis(painter);
@@ -140,6 +165,9 @@ void RenderArea::updatePlot()
     delete pixmap;
     pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);
+//    delete image;
+//    image = new QImage(Area->width(), Area->height(), QImage::Format_RGB16);
+//    QPainter painter(image);
     drawBackground(painter);
     drawAxis(painter);    
     drawSamples(painter);
@@ -152,6 +180,7 @@ void RenderArea::updatePlot()
  {
      QPainter painter(this);
      painter.drawPixmap(0, 0, *pixmap);
+//     painter.drawImage(0,0, *image);
  }
 
  void RenderArea::mouseReleaseEvent(QMouseEvent * event)
