@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "renderarea.h"
 #include <QFile>
+#include <QTextStream>
 #include <QtMath>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -105,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
     connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
     connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
+    connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -167,6 +169,20 @@ void MainWindow::cBxIntervalsCurrentIndexChanged(int index)
 
 void MainWindow::pBtnSaveMarkersClicked()
 {
+    //    For Windows:
+    QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
+    QFile labelsFile(labelsFileName);
+//    if(labelsFile.exists()) {
+//        // Ask if overwrite
+//    }
+//    else {
+        labelsFile.open(QIODevice::WriteOnly);
+        QTextStream outfile(&labelsFile);
+        for(int i=0; i<vectMarks.length(); i++) {
+            outfile << static_cast<qint32>(vectMarks[i]);
+        }
+        labelsFile.close();
+//    }
 
 }
 
@@ -244,6 +260,7 @@ void MainWindow::pBtnLoadWavClicked()
       edMarkerPosition->setEnabled(true);
       edSamplesInWav->setEnabled(true);
       pBtnLoadMarkers->setEnabled(true);
+      pBtnSaveMarkers->setEnabled(true);
       edCurrentWavFile->setEnabled(true);
       edWavFileSamplRate->setEnabled(true);
       edWavFileBitsPerSample->setEnabled(true);
