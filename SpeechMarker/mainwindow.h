@@ -12,7 +12,7 @@
 
 class RenderArea;
 
-#define defaultLabel "-------?-------"
+#define defaultLabel "??"
 
 struct wavHeader {
     char chunkID[4];

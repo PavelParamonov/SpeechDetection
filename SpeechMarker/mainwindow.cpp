@@ -46,9 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     edWavFileBitsPerSample->setReadOnly(true);
     edWavFileBitsPerSample->setMaximumWidth(60);
     cBxMarkType = new QComboBox();
-    cBxMarkType->addItem("-------?-------");
-    cBxMarkType->addItem("Silence");
-    cBxMarkType->addItem("Speech");
+    cBxMarkType->addItem(defaultLabel);
+    cBxMarkType->addItem("SL");
+    cBxMarkType->addItem("SP");
     cBxMarkType->setMinimumWidth(80);
     cBxMarkType->setEnabled(false);
     cBxWindowSize = new QComboBox();
