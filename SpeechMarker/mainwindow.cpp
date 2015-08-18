@@ -110,8 +110,9 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
 {
     markerPosition = newPosition;
+    // Changing of text also invokes graphArea update, so no need
+    // to call it manually.
     edMarkerPosition->setText(QString::number(markerPosition));
-    graphArea->updatePlot();
 }
 
 void MainWindow::edMarkerPositionTextEdited(const QString &newText)
@@ -222,6 +223,7 @@ void MainWindow::pBtnLoadWavClicked()
           }
       }
       wavFile.close();
+      graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       // Type wav file information:
       edCurrentWavFile->setText(wavFileName);
       edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
@@ -254,7 +256,6 @@ void MainWindow::pBtnLoadWavClicked()
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
       // Visualize samples:
-      graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       graphArea->setEnabled(true);
       graphArea->updatePlot();
     }

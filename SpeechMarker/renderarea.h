@@ -13,8 +13,8 @@ public:
     explicit RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent = 0);
     ~RenderArea();
 
-    QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-    QSize sizeHint() const Q_DECL_OVERRIDE;
+    QSize minimumSizeHint() const;
+    QSize sizeHint() const;
     void setSampleMaxValue(int v) {maxSampleValue=v;}
     void setSelectedInterval(int ind) {selectedInterval=ind;}
     void updatePlot();
