@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "renderarea.h"
 #include <QFile>
+#include <QTextStream>
 #include <QtMath>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -46,9 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
     edWavFileBitsPerSample->setReadOnly(true);
     edWavFileBitsPerSample->setMaximumWidth(60);
     cBxMarkType = new QComboBox();
-    cBxMarkType->addItem("-------?-------");
-    cBxMarkType->addItem("Silence");
-    cBxMarkType->addItem("Speech");
+    cBxMarkType->addItem(defaultLabel);
+    cBxMarkType->addItem("SL");
+    cBxMarkType->addItem("SP");
     cBxMarkType->setMinimumWidth(80);
     cBxMarkType->setEnabled(false);
     cBxWindowSize = new QComboBox();
@@ -105,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
     connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
     connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
+    connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -168,7 +170,26 @@ void MainWindow::cBxIntervalsCurrentIndexChanged(int index)
 
 void MainWindow::pBtnSaveMarkersClicked()
 {
-
+    //    For Windows:
+    QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
+    QFile labelsFile(labelsFileName);
+    if(labelsFile.open(QIODevice::WriteOnly)) {
+        QTextStream outfile(&labelsFile);
+        for(int i=0; i<vectMarks.length(); i++) {
+            outfile << static_cast<qint32>(vectMarks[i]);
+            if(i < vectLabels.length())
+                outfile << " "
+                        << vectLabels[i]
+                           << " ";
+            else
+                outfile << "";
+        }
+        labelsFile.close();
+    }
+    else
+    {
+        // Some message on open failure
+    }
 }
 
 void MainWindow::pBtnLoadWavClicked()
@@ -246,6 +267,7 @@ void MainWindow::pBtnLoadWavClicked()
       edMarkerPosition->setEnabled(true);
       edSamplesInWav->setEnabled(true);
       pBtnLoadMarkers->setEnabled(true);
+      pBtnSaveMarkers->setEnabled(true);
       edCurrentWavFile->setEnabled(true);
       edWavFileSamplRate->setEnabled(true);
       edWavFileBitsPerSample->setEnabled(true);
