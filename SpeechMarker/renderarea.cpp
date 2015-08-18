@@ -7,8 +7,6 @@ RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers,
 {
     Area = new QRect(0,0,this->width(), this->height());
     pixmap = new QPixmap(Area->width(), Area->height());
-//    image = new QImage(Area->width(), Area->height(), QImage::Format_RGB16);
-
     brBackground = new QBrush(QColor(255,255,255));
     pnAxis = new QPen(QColor(0,0,0));
     pnCurve = new QPen(QColor(0,0,200));
@@ -118,11 +116,8 @@ void RenderArea::resizeEvent(QResizeEvent *event)
     Area->setRect(0,0,this->width(), this->height());
 
     delete pixmap;
-//    delete image;
     pixmap = new QPixmap(Area->width(), Area->height());
-//    image = new QImage(Area->width(), Area->height(), QImage::Format_RGB16);
     QPainter painter(pixmap);
-//    QPainter painter(image);
     drawBackground(painter);
     drawBackground(painter);
     drawAxis(painter);
@@ -136,9 +131,6 @@ void RenderArea::updatePlot()
     delete pixmap;
     pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);
-//    delete image;
-//    image = new QImage(Area->width(), Area->height(), QImage::Format_RGB16);
-//    QPainter painter(image);
     drawBackground(painter);
     drawAxis(painter);    
     drawSamples(painter);
@@ -151,7 +143,6 @@ void RenderArea::updatePlot()
  {
      QPainter painter(this);
      painter.drawPixmap(0, 0, *pixmap);
-//     painter.drawImage(0,0, *image);
  }
 
  void RenderArea::mouseReleaseEvent(QMouseEvent * event)
