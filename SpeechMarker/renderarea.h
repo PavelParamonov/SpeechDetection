@@ -7,7 +7,7 @@
 #include <QVector>
 #include <QMouseEvent>
 
-class RenderArea : public QOpenGLWidget
+class RenderArea : public QWidget
 {
     Q_OBJECT
 public:
