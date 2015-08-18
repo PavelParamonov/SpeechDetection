@@ -172,18 +172,23 @@ void MainWindow::pBtnSaveMarkersClicked()
     //    For Windows:
     QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
     QFile labelsFile(labelsFileName);
-//    if(labelsFile.exists()) {
-//        // Ask if overwrite
-//    }
-//    else {
-        labelsFile.open(QIODevice::WriteOnly);
+    if(labelsFile.open(QIODevice::WriteOnly)) {
         QTextStream outfile(&labelsFile);
         for(int i=0; i<vectMarks.length(); i++) {
             outfile << static_cast<qint32>(vectMarks[i]);
+            if(i < vectLabels.length())
+                outfile << " "
+                        << vectLabels[i]
+                           << " ";
+            else
+                outfile << "";
         }
         labelsFile.close();
-//    }
-
+    }
+    else
+    {
+        // Some message on open failure
+    }
 }
 
 void MainWindow::pBtnLoadWavClicked()
