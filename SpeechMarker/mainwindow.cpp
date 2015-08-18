@@ -110,8 +110,9 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
 {
     markerPosition = newPosition;
+    // Changing of text also invokes graphArea update, so no need
+    // to call it manually.
     edMarkerPosition->setText(QString::number(markerPosition));
-    graphArea->updatePlot();
 }
 
 void MainWindow::edMarkerPositionTextEdited(const QString &newText)
@@ -255,7 +256,6 @@ void MainWindow::pBtnLoadWavClicked()
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
       // Visualize samples:
-
       graphArea->setEnabled(true);
       graphArea->updatePlot();
     }
