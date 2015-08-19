@@ -40,6 +40,7 @@ public:
 public slots:
     void pBtnLoadWavClicked();
     void pBtnSaveMarkersClicked();
+    void pBtnLoadMarkersClicked();
     void pBtnPlaceMarkClicked();
     void cBxMarkTypeCurrentIndexChanged(const QString & text);
     void cBxIntervalsCurrentIndexChanged(int index);

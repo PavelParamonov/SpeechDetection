@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtMath>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
@@ -107,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
     connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
     connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
+    connect(pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(pBtnLoadMarkersClicked()));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -190,6 +192,52 @@ void MainWindow::pBtnSaveMarkersClicked()
     {
         // Some message on open failure
     }
+}
+
+void MainWindow::pBtnLoadMarkersClicked()
+{
+    //    For Windows:
+    QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
+    QFile labelsFile(labelsFileName);
+    if(!labelsFile.exists()) {
+        QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + ". File doesn't exist!");
+    }
+    else {
+        if(labelsFile.open(QIODevice::ReadOnly)) {
+            // Block signals from cBxIntervals and edMarkerPosition to prevent excessive updates of graphArea:
+            cBxIntervals->blockSignals(true);
+            edMarkerPosition->blockSignals(true);
+            // Clear all marks and labels:
+            vectMarks.clear();
+            vectLabels.clear();
+            cBxIntervals->clear();
+            int tmp_mark = 0;
+            QString tmp_label;
+            QTextStream infile(&labelsFile);
+            while(!infile.atEnd()) {
+                infile >> tmp_mark;
+                infile >> tmp_label;
+                vectMarks.append(tmp_mark);
+                if(!tmp_label.isEmpty())
+                    vectLabels.append(tmp_label);
+            }
+            // Fill in intervals list with newly read marks:
+            for(int i=0; i < vectLabels.length(); i++) {
+                cBxIntervals->addItem(QString::number(vectMarks[i]) + "-" + QString::number(vectMarks[i+1]));
+            }
+            markerPosition = 0;
+            edMarkerPosition->setText(QString::number(markerPosition));
+            // Unblock signals emission and force update of graphArea:
+            cBxIntervals->blockSignals(false);
+            edMarkerPosition->blockSignals(false);
+            graphArea->updatePlot();
+            labelsFile.close();
+        }
+        else {
+            QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + " for reading.");
+        }
+    }
+
 }
 
 void MainWindow::pBtnLoadWavClicked()
