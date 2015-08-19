@@ -293,15 +293,18 @@ void MainWindow::pBtnLoadWavClicked()
       }
       wavFile.close();
       graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
+      // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
+      edMarkerPosition->blockSignals(true);
+      cBxIntervals->blockSignals(true);
       // Type wav file information:
       edCurrentWavFile->setText(wavFileName);
       edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
       edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
       edSamplesInWav->setText(QString::number(vectSamples.length()));
-      // Add default label that cover the whole wav:
+      // Add default label that covers the whole wav:
       vectLabels.clear();
       vectLabels.append(defaultLabel);
-      // Clear all previusly set marks:
+      // Clear all previously set marks:
       vectMarks.clear();
       // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
       vectMarks.append(0);
@@ -325,7 +328,9 @@ void MainWindow::pBtnLoadWavClicked()
       cBxMarkType->setEnabled(true);
       cBxWindowSize->setEnabled(true);
       pBtnPlaceMark->setEnabled(true);
-      // Visualize samples:
+      // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
+      edMarkerPosition->blockSignals(false);
+      cBxIntervals->blockSignals(false);
       graphArea->setEnabled(true);
       graphArea->updatePlot();
     }
