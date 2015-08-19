@@ -13,6 +13,7 @@
 class RenderArea;
 
 #define defaultLabel "??"
+#define zoomCoeff 1.5
 
 struct wavHeader {
     char chunkID[4];
@@ -42,6 +43,7 @@ public slots:
     void pBtnSaveMarkersClicked();
     void pBtnLoadMarkersClicked();
     void pBtnPlaceMarkClicked();
+    void pBtnZoomInClicked();
     void cBxMarkTypeCurrentIndexChanged(const QString & text);
     void cBxIntervalsCurrentIndexChanged(int index);
     void edMarkerPositionTextEdited(const QString &newText);
@@ -60,6 +62,7 @@ private:
     QVector<int>    vectSamples, vectMarks;
     QVector<QString> vectLabels;
     int markerPosition;
+    int visibleSamplesCnt;
 };
 
 #endif // MAINWINDOW_H

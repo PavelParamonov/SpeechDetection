@@ -58,8 +58,6 @@ void RenderArea::drawAxis(QPainter &painter)
 void RenderArea::drawMarker(QPainter &painter)
 {
     painter.setPen(*pnMarker);
-    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
-    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
     pointUpperMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
     pointLowerMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
     pointLowerMarkerEnd->setY(this->height());
@@ -69,8 +67,6 @@ void RenderArea::drawMarker(QPainter &painter)
 void RenderArea::drawMarks(QPainter &painter)
 {
     painter.setPen(*pnMarks);
-    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
-    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
     for(int i=0; i<vectMarks->length(); i++) {
         QPoint upperPoint(qFloor(static_cast<double>(vectMarks->data()[i])/xScaleSamples), 0);
         QPoint lowerPoint(qFloor(static_cast<double>(vectMarks->data()[i])/xScaleSamples),this->height());
@@ -80,10 +76,6 @@ void RenderArea::drawMarks(QPainter &painter)
 
 void RenderArea::drawSamples(QPainter &painter)
 {
-
-    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
-    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
-
     /*  Let's implement drawing in three parts:
         - draw samples BEFORE selected interval with pen pnCurve;
         - draw samples INSIDE selected interval with pen pnCurveSelected;
@@ -91,30 +83,37 @@ void RenderArea::drawSamples(QPainter &painter)
     */
     if(vectSamples->length() > 0) {
         double hd_cast = static_cast<double>(this->height())/2;
-        QVector<QPoint> pointsToDraw(vectSamples->length());
+//        QVector<QPoint> pointsToDraw(vectSamples->length());
+        QVector<QPoint> pointsToDraw(rightVisibleBorder - leftVisibleBorder+1);
         for(int i=0; i < pointsToDraw.length(); i++) {
             pointsToDraw[i].setX(qFloor(i/xScaleSamples));
-            pointsToDraw[i].setY(-yScaleSamples*vectSamples->data()[i]+hd_cast);
+            pointsToDraw[i].setY(-yScaleSamples*vectSamples->data()[i+leftVisibleBorder]+hd_cast);
         }
         // Before selected interval:
         painter.setPen(*pnCurve);
-        int pointsCnt = vectMarks->at(selectedInterval);
-        painter.drawPolyline(pointsToDraw.data(), pointsCnt);
+        int pointsCntBefore = vectMarks->at(selectedInterval) - leftVisibleBorder;
+        pointsCntBefore = pointsCntBefore > 0? pointsCntBefore : 0;
+        painter.drawPolyline(pointsToDraw.data(), pointsCntBefore);
         // Inside selected interval:
         painter.setPen(*pnCurveSelected);
-        pointsCnt = vectMarks->at(selectedInterval+1)-vectMarks->at(selectedInterval);
-        painter.drawPolyline(pointsToDraw.data() + vectMarks->at(selectedInterval), pointsCnt);
+        int pointsCntInside = (vectMarks->at(selectedInterval+1) < rightVisibleBorder? vectMarks->at(selectedInterval+1) : rightVisibleBorder) -
+                              (vectMarks->at(selectedInterval)   > leftVisibleBorder?  vectMarks->at(selectedInterval)   : leftVisibleBorder);
+        pointsCntInside = pointsCntInside > 0? pointsCntInside : 0;
+        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore, pointsCntInside);
         // After selected interval:
         painter.setPen(*pnCurve);
-        pointsCnt = vectSamples->length() - vectMarks->at(selectedInterval+1);
-        painter.drawPolyline(pointsToDraw.data() + vectMarks->at(selectedInterval+1), pointsCnt);
+        int pointsCntAfter = rightVisibleBorder - vectMarks->at(selectedInterval+1);
+        pointsCntAfter = pointsCntAfter > 0? pointsCntAfter : 0;
+        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore + pointsCntInside, pointsCntAfter);
     }
 }
 
 void RenderArea::resizeEvent(QResizeEvent *event)
 {
     Area->setRect(0,0,this->width(), this->height());
-
+    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
+//    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
+    xScaleSamples = static_cast<double>(rightVisibleBorder - leftVisibleBorder+1)/static_cast<double>(this->width());
     delete pixmap;
     pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);
@@ -128,6 +127,9 @@ void RenderArea::resizeEvent(QResizeEvent *event)
 
 void RenderArea::updatePlot()
 {
+    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
+//    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
+    xScaleSamples = static_cast<double>(rightVisibleBorder - leftVisibleBorder+1)/static_cast<double>(this->width());
     delete pixmap;
     pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);

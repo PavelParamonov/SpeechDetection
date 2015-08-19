@@ -17,6 +17,7 @@ public:
     QSize sizeHint() const;
     void setSampleMaxValue(int v) {maxSampleValue=v;}
     void setSelectedInterval(int ind) {selectedInterval=ind;}
+    void setVisibleBorders(int left, int right) {leftVisibleBorder = left; rightVisibleBorder = right;}
     void updatePlot();
 signals:
     void markerPositionChanged(int newPosition);
@@ -39,6 +40,7 @@ private:
     // -----------------------------------------
     double xScaleSamples, yScaleSamples;
     int selectedInterval;
+    int leftVisibleBorder, rightVisibleBorder;
     // Drawing functions:
     void drawBackground(QPainter &painter);
     void drawMarker(QPainter &painter);

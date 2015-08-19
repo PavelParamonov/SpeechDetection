@@ -8,6 +8,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
+    visibleSamplesCnt = 0;
+
     markerPosition = 0;
     graphArea = new RenderArea(&vectSamples, &vectMarks, &markerPosition);
     graphArea->setEnabled(false);
@@ -109,6 +111,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
     connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
     connect(pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(pBtnLoadMarkersClicked()));
+    connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -240,6 +243,16 @@ void MainWindow::pBtnLoadMarkersClicked()
 
 }
 
+void MainWindow::pBtnZoomInClicked()
+{
+    visibleSamplesCnt = visibleSamplesCnt / zoomCoeff;
+    int leftVisibleBorder = markerPosition - visibleSamplesCnt/2;
+    leftVisibleBorder = leftVisibleBorder > 0? leftVisibleBorder : 0;
+    int rightVisibleBorder = leftVisibleBorder + visibleSamplesCnt-1;
+    graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    graphArea->updatePlot();
+}
+
 void MainWindow::pBtnLoadWavClicked()
 {
 //    For Windows:
@@ -292,6 +305,10 @@ void MainWindow::pBtnLoadWavClicked()
           }
       }
       wavFile.close();
+
+      visibleSamplesCnt = vectSamples.length();
+      graphArea->setVisibleBorders(0, vectSamples.length()-1);
+
       graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
       // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
       edMarkerPosition->blockSignals(true);
