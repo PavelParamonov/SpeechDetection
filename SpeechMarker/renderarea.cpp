@@ -149,5 +149,5 @@ void RenderArea::updatePlot()
 
  void RenderArea::mouseReleaseEvent(QMouseEvent * event)
  {
-    emit markerPositionChanged(qFloor(event->x() * xScaleSamples));
+    emit markerPositionChanged(qFloor(event->x() * xScaleSamples) + leftVisibleBorder);
  }
