@@ -58,8 +58,8 @@ void RenderArea::drawAxis(QPainter &painter)
 void RenderArea::drawMarker(QPainter &painter)
 {
     painter.setPen(*pnMarker);
-    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
-    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(*markerPos)/xScaleSamples));
+    pointUpperMarkerEnd->setX(qFloor(static_cast<double>(*markerPos - leftVisibleBorder)/xScaleSamples));
+    pointLowerMarkerEnd->setX(qFloor(static_cast<double>(*markerPos - leftVisibleBorder)/xScaleSamples));
     pointLowerMarkerEnd->setY(this->height());
     painter.drawLine(*pointUpperMarkerEnd, *pointLowerMarkerEnd);
 }
@@ -68,8 +68,8 @@ void RenderArea::drawMarks(QPainter &painter)
 {
     painter.setPen(*pnMarks);
     for(int i=0; i<vectMarks->length(); i++) {
-        QPoint upperPoint(qFloor(static_cast<double>(vectMarks->data()[i])/xScaleSamples), 0);
-        QPoint lowerPoint(qFloor(static_cast<double>(vectMarks->data()[i])/xScaleSamples),this->height());
+        QPoint upperPoint(qFloor(static_cast<double>(vectMarks->data()[i]- leftVisibleBorder)/xScaleSamples), 0);
+        QPoint lowerPoint(qFloor(static_cast<double>(vectMarks->data()[i]- leftVisibleBorder)/xScaleSamples),this->height());
         painter.drawLine(upperPoint, lowerPoint);
     }
 }
