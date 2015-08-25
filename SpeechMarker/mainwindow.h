@@ -44,6 +44,7 @@ public slots:
     void pBtnLoadMarkersClicked();
     void pBtnPlaceMarkClicked();
     void pBtnZoomInClicked();
+    void pBtnZoomOutClicked();
     void cBxMarkTypeCurrentIndexChanged(const QString & text);
     void cBxIntervalsCurrentIndexChanged(int index);
     void edMarkerPositionTextEdited(const QString &newText);

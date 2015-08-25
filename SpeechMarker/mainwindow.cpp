@@ -112,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
     connect(pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(pBtnLoadMarkersClicked()));
     connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
+    connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -246,9 +247,35 @@ void MainWindow::pBtnLoadMarkersClicked()
 void MainWindow::pBtnZoomInClicked()
 {
     visibleSamplesCnt = visibleSamplesCnt / zoomCoeff;
+    visibleSamplesCnt = visibleSamplesCnt < 100? 100 : visibleSamplesCnt;
     int leftVisibleBorder = markerPosition - visibleSamplesCnt/2;
-    leftVisibleBorder = leftVisibleBorder > 0? leftVisibleBorder : 0;
+    if(leftVisibleBorder < 0) {
+        leftVisibleBorder = 0;
+    }
     int rightVisibleBorder = leftVisibleBorder + visibleSamplesCnt-1;
+    if(rightVisibleBorder >= vectSamples.length()) {
+        rightVisibleBorder = vectSamples.length()-1;
+        leftVisibleBorder = rightVisibleBorder - (visibleSamplesCnt-1);
+    }
+    visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
+    graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    graphArea->updatePlot();
+}
+
+void MainWindow::pBtnZoomOutClicked()
+{
+    visibleSamplesCnt = visibleSamplesCnt * zoomCoeff;
+    visibleSamplesCnt = (visibleSamplesCnt > vectSamples.length())? vectSamples.length() : visibleSamplesCnt;
+    int leftVisibleBorder = markerPosition - visibleSamplesCnt/2;
+    if(leftVisibleBorder < 0) {
+        leftVisibleBorder = 0;
+    }
+    int rightVisibleBorder = leftVisibleBorder + visibleSamplesCnt-1;
+    if(rightVisibleBorder >= vectSamples.length()) {
+        rightVisibleBorder = vectSamples.length()-1;
+        leftVisibleBorder = rightVisibleBorder - (visibleSamplesCnt-1);
+    }
+    visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
     graphArea->updatePlot();
 }
