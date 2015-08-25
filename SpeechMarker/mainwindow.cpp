@@ -4,6 +4,8 @@
 #include <QTextStream>
 #include <QtMath>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
@@ -198,71 +200,77 @@ void MainWindow::cBxIntervalsCurrentIndexChanged(int index)
 void MainWindow::pBtnSaveMarkersClicked()
 {
     //    For Windows:
-    QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
-    QFile labelsFile(labelsFileName);
-    if(labelsFile.open(QIODevice::WriteOnly)) {
-        QTextStream outfile(&labelsFile);
-        for(int i=0; i<vectMarks.length(); i++) {
-            outfile << static_cast<qint32>(vectMarks[i]);
-            if(i < vectLabels.length())
-                outfile << " "
-                        << vectLabels[i]
-                           << " ";
-            else
-                outfile << "";
+    //QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
+    QString labelsFileName = QFileDialog::getSaveFileName(this, "Save Marks", QDir::currentPath(), "*.txt");
+    if(!labelsFileName.isEmpty()) {
+        QFile labelsFile(labelsFileName);
+        if(labelsFile.open(QIODevice::WriteOnly)) {
+            QTextStream outfile(&labelsFile);
+            for(int i=0; i<vectMarks.length(); i++) {
+                outfile << static_cast<qint32>(vectMarks[i]);
+                if(i < vectLabels.length())
+                    outfile << " "
+                            << vectLabels[i]
+                               << " ";
+                else
+                    outfile << "";
+            }
+            labelsFile.close();
         }
-        labelsFile.close();
-    }
-    else
-    {
-        // Some message on open failure
+        else
+        {
+            // Some message on open failure
+            QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + " for writing!");
+        }
     }
 }
 
 void MainWindow::pBtnLoadMarkersClicked()
 {
     //    For Windows:
-    QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
-    QFile labelsFile(labelsFileName);
-    if(!labelsFile.exists()) {
-        QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + ". File doesn't exist!");
-    }
-    else {
-        if(labelsFile.open(QIODevice::ReadOnly)) {
-            // Block signals from cBxIntervals and edMarkerPosition to prevent excessive updates of graphArea:
-            cBxIntervals->blockSignals(true);
-            edMarkerPosition->blockSignals(true);
-            // Clear all marks and labels:
-            vectMarks.clear();
-            vectLabels.clear();
-            cBxIntervals->clear();
-            int tmp_mark = 0;
-            QString tmp_label;
-            QTextStream infile(&labelsFile);
-            while(!infile.atEnd()) {
-                infile >> tmp_mark;
-                infile >> tmp_label;
-                vectMarks.append(tmp_mark);
-                if(!tmp_label.isEmpty())
-                    vectLabels.append(tmp_label);
-            }
-            // Fill in intervals list with newly read marks:
-            for(int i=0; i < vectLabels.length(); i++) {
-                cBxIntervals->addItem(QString::number(vectMarks[i]) + "-" + QString::number(vectMarks[i+1]));
-            }
-            markerPosition = 0;
-            edMarkerPosition->setText(QString::number(markerPosition));
-            // Unblock signals emission and force update of graphArea:
-            cBxIntervals->blockSignals(false);
-            edMarkerPosition->blockSignals(false);
-            graphArea->updatePlot();
-            labelsFile.close();
+//    QString labelsFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\labels_example.txt");
+    QString labelsFileName = QFileDialog::getOpenFileName(this, "Save Marks", QDir::currentPath(), "*.txt");
+    if(!labelsFileName.isEmpty()) {
+        QFile labelsFile(labelsFileName);
+        if(!labelsFile.exists()) {
+            QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + ". File doesn't exist!");
         }
         else {
-            QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + " for reading.");
+            if(labelsFile.open(QIODevice::ReadOnly)) {
+                // Block signals from cBxIntervals and edMarkerPosition to prevent excessive updates of graphArea:
+                cBxIntervals->blockSignals(true);
+                edMarkerPosition->blockSignals(true);
+                // Clear all marks and labels:
+                vectMarks.clear();
+                vectLabels.clear();
+                cBxIntervals->clear();
+                int tmp_mark = 0;
+                QString tmp_label;
+                QTextStream infile(&labelsFile);
+                while(!infile.atEnd()) {
+                    infile >> tmp_mark;
+                    infile >> tmp_label;
+                    vectMarks.append(tmp_mark);
+                    if(!tmp_label.isEmpty())
+                        vectLabels.append(tmp_label);
+                }
+                // Fill in intervals list with newly read marks:
+                for(int i=0; i < vectLabels.length(); i++) {
+                    cBxIntervals->addItem(QString::number(vectMarks[i]) + "-" + QString::number(vectMarks[i+1]));
+                }
+                markerPosition = 0;
+                edMarkerPosition->setText(QString::number(markerPosition));
+                // Unblock signals emission and force update of graphArea:
+                cBxIntervals->blockSignals(false);
+                edMarkerPosition->blockSignals(false);
+                graphArea->updatePlot();
+                labelsFile.close();
+            }
+            else {
+                QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + " for reading.");
+            }
         }
     }
-
 }
 
 void MainWindow::pBtnZoomInClicked()
@@ -304,100 +312,103 @@ void MainWindow::pBtnZoomOutClicked()
 void MainWindow::pBtnLoadWavClicked()
 {
 //    For Windows:
-    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
-//  For Linux:
+//    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
+//    For Linux:
 //    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
-    QFile wavFile(wavFileName);
-    if (!wavFile.exists()) {
-        edCurrentWavFile->setText("File doesn't exist");
-    }
-    else {
-      wavFile.open(QIODevice::ReadOnly);
-      wavHeader wavFileHeader;
-      QDataStream inFile(&wavFile);
-      int bytesRead=0;
-      bytesRead += inFile.readRawData(wavFileHeader.chunkID, 4);
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.chunkSize), sizeof(wavFileHeader.chunkSize));
-      bytesRead += inFile.readRawData(wavFileHeader.format, 4);
-      bytesRead += inFile.readRawData(wavFileHeader.subchunk1ID, 4);
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk1Size), sizeof(wavFileHeader.subchunk1Size));
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.audioFormat), sizeof(wavFileHeader.audioFormat));
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.numChannels), sizeof(wavFileHeader.numChannels));
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.sampleRate), sizeof(wavFileHeader.sampleRate));
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.byteRate), sizeof(wavFileHeader.byteRate));
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.blockAlign), sizeof(wavFileHeader.blockAlign));
-      bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.bitsPerSample), sizeof(wavFileHeader.bitsPerSample));
-      inFile.skipRawData(wavFileHeader.subchunk1Size +
-                         sizeof(wavFileHeader.chunkID) +
-                         sizeof(wavFileHeader.chunkSize) +
-                         sizeof(wavFileHeader.format) +
-                         sizeof(wavFileHeader.subchunk1ID) +
-                         sizeof(wavFileHeader.subchunk1Size) -
-                         bytesRead);
-      inFile.readRawData(wavFileHeader.subchunk2ID, 4);
-      inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk2Size), sizeof(wavFileHeader.subchunk2Size));
-      vectSamples.clear();
-      vectSamples.resize(wavFileHeader.subchunk2Size/(wavFileHeader.bitsPerSample/8));
-      for(int i=0; i<vectSamples.length();i++) {
-          switch (wavFileHeader.bitsPerSample/8) {
-          case 1:
-              unsigned char charBuffer;
-              inFile.readRawData(reinterpret_cast<char *>(&charBuffer), sizeof(charBuffer));
-              vectSamples.data()[i] = static_cast<int>(charBuffer);
-              break;
-          case 2:
-              signed short shortBuffer;
-              inFile.readRawData(reinterpret_cast<char *>(&shortBuffer), sizeof(shortBuffer));
-              vectSamples.data()[i] = static_cast<int>(shortBuffer);
-              break;
-          }
-      }
-      wavFile.close();
+    QString wavFileName = QFileDialog::getOpenFileName(this, "Save Marks", QDir::currentPath(), "*.wav");
+    if(!wavFileName.isEmpty()) {
+        QFile wavFile(wavFileName);
+        if (!wavFile.exists()) {
+            edCurrentWavFile->setText("File doesn't exist");
+        }
+        else {
+            wavFile.open(QIODevice::ReadOnly);
+            wavHeader wavFileHeader;
+            QDataStream inFile(&wavFile);
+            int bytesRead=0;
+            bytesRead += inFile.readRawData(wavFileHeader.chunkID, 4);
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.chunkSize), sizeof(wavFileHeader.chunkSize));
+            bytesRead += inFile.readRawData(wavFileHeader.format, 4);
+            bytesRead += inFile.readRawData(wavFileHeader.subchunk1ID, 4);
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk1Size), sizeof(wavFileHeader.subchunk1Size));
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.audioFormat), sizeof(wavFileHeader.audioFormat));
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.numChannels), sizeof(wavFileHeader.numChannels));
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.sampleRate), sizeof(wavFileHeader.sampleRate));
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.byteRate), sizeof(wavFileHeader.byteRate));
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.blockAlign), sizeof(wavFileHeader.blockAlign));
+            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.bitsPerSample), sizeof(wavFileHeader.bitsPerSample));
+            inFile.skipRawData(wavFileHeader.subchunk1Size +
+                               sizeof(wavFileHeader.chunkID) +
+                               sizeof(wavFileHeader.chunkSize) +
+                               sizeof(wavFileHeader.format) +
+                               sizeof(wavFileHeader.subchunk1ID) +
+                               sizeof(wavFileHeader.subchunk1Size) -
+                               bytesRead);
+            inFile.readRawData(wavFileHeader.subchunk2ID, 4);
+            inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk2Size), sizeof(wavFileHeader.subchunk2Size));
+            vectSamples.clear();
+            vectSamples.resize(wavFileHeader.subchunk2Size/(wavFileHeader.bitsPerSample/8));
+            for(int i=0; i<vectSamples.length();i++) {
+                switch (wavFileHeader.bitsPerSample/8) {
+                case 1:
+                    unsigned char charBuffer;
+                    inFile.readRawData(reinterpret_cast<char *>(&charBuffer), sizeof(charBuffer));
+                    vectSamples.data()[i] = static_cast<int>(charBuffer);
+                    break;
+                case 2:
+                    signed short shortBuffer;
+                    inFile.readRawData(reinterpret_cast<char *>(&shortBuffer), sizeof(shortBuffer));
+                    vectSamples.data()[i] = static_cast<int>(shortBuffer);
+                    break;
+                }
+            }
+            wavFile.close();
 
-      visibleSamplesCnt = vectSamples.length();
-      graphArea->setVisibleBorders(0, vectSamples.length()-1);
+            visibleSamplesCnt = vectSamples.length();
+            graphArea->setVisibleBorders(0, vectSamples.length()-1);
 
-      graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
-      // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
-      edMarkerPosition->blockSignals(true);
-      cBxIntervals->blockSignals(true);
-      // Type wav file information:
-      edCurrentWavFile->setText(wavFileName);
-      edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
-      edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
-      edSamplesInWav->setText(QString::number(vectSamples.length()));
-      // Add default label that covers the whole wav:
-      vectLabels.clear();
-      vectLabels.append(defaultLabel);
-      // Clear all previously set marks:
-      vectMarks.clear();
-      // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
-      vectMarks.append(0);
-      vectMarks.append(vectSamples.length()-1);
-      // When wav file is opened we have one interval from begining to the end:
-      cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
-      // Initial marker position:
-      markerPosition = 0;
-      edMarkerPosition->setText(QString::number(markerPosition));
-      // Unlock all necessary GUI elements:
-      edMarkerPosition->setEnabled(true);
-      edSamplesInWav->setEnabled(true);
-      pBtnLoadMarkers->setEnabled(true);
-      pBtnSaveMarkers->setEnabled(true);
-      edCurrentWavFile->setEnabled(true);
-      edWavFileSamplRate->setEnabled(true);
-      edWavFileBitsPerSample->setEnabled(true);
-      pBtnZoomIn->setEnabled(true);
-      pBtnZoomOut->setEnabled(true);
-      cBxIntervals->setEnabled(true);
-      cBxMarkType->setEnabled(true);
-      cBxWindowSize->setEnabled(true);
-      pBtnPlaceMark->setEnabled(true);
-      // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
-      edMarkerPosition->blockSignals(false);
-      cBxIntervals->blockSignals(false);
-      graphArea->setEnabled(true);
-      graphArea->updatePlot();
+            graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
+            // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
+            edMarkerPosition->blockSignals(true);
+            cBxIntervals->blockSignals(true);
+            // Type wav file information:
+            edCurrentWavFile->setText(wavFileName);
+            edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
+            edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
+            edSamplesInWav->setText(QString::number(vectSamples.length()));
+            // Add default label that covers the whole wav:
+            vectLabels.clear();
+            vectLabels.append(defaultLabel);
+            // Clear all previously set marks:
+            vectMarks.clear();
+            // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
+            vectMarks.append(0);
+            vectMarks.append(vectSamples.length()-1);
+            // When wav file is opened we have one interval from begining to the end:
+            cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
+            // Initial marker position:
+            markerPosition = 0;
+            edMarkerPosition->setText(QString::number(markerPosition));
+            // Unlock all necessary GUI elements:
+            edMarkerPosition->setEnabled(true);
+            edSamplesInWav->setEnabled(true);
+            pBtnLoadMarkers->setEnabled(true);
+            pBtnSaveMarkers->setEnabled(true);
+            edCurrentWavFile->setEnabled(true);
+            edWavFileSamplRate->setEnabled(true);
+            edWavFileBitsPerSample->setEnabled(true);
+            pBtnZoomIn->setEnabled(true);
+            pBtnZoomOut->setEnabled(true);
+            cBxIntervals->setEnabled(true);
+            cBxMarkType->setEnabled(true);
+            cBxWindowSize->setEnabled(true);
+            pBtnPlaceMark->setEnabled(true);
+            // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
+            edMarkerPosition->blockSignals(false);
+            cBxIntervals->blockSignals(false);
+            graphArea->setEnabled(true);
+            graphArea->updatePlot();
+        }
     }
 }
 
