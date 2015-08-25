@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     pBtnZoomIn->setEnabled(false);
     pBtnZoomOut = new QPushButton("Zoom Out");
     pBtnZoomOut->setEnabled(false);
+    pBtnRemoveMark = new QPushButton("Remove mark");
+    pBtnRemoveMark->setEnabled(false);
     lbCurrentWavFile = new QLabel("Wav File:");
     lbWavFileSamplRate = new QLabel("Sample Rate:");
     lbWavFileBitsPerSample = new QLabel("Bits per sample:");
@@ -80,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
     vBoxLayMarksSettings->addWidget(pBtnZoomOut);
     vBoxLayMarksSettings->addWidget(cBxWindowSize);
     vBoxLayMarksSettings->addWidget(pBtnPlaceMark);
+    vBoxLayMarksSettings->addWidget(pBtnRemoveMark);
 
     hBoxLayWavFileLabel = new QHBoxLayout();
     hBoxLayWavFileLabel->addWidget(lbCurrentWavFile);
@@ -113,6 +116,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(pBtnLoadMarkersClicked()));
     connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
     connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
+    connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -156,7 +160,24 @@ void MainWindow::pBtnPlaceMarkClicked()
         cBxIntervals->removeItem(i-1);
         cBxIntervals->insertItem(i-1, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
         cBxIntervals->insertItem(i, QString::number(vectMarks.data()[i]) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i+1]));
+        pBtnRemoveMark->setEnabled(true);
     }
+}
+
+void MainWindow::pBtnRemoveMarkClicked()
+{
+    int i = vectMarks.indexOf(markerPosition);
+    if((i != -1) && (i != 0) && (i != vectMarks.length()-1)) {
+        QString currentIntervalLabel = vectLabels.data()[i-1];
+        vectLabels.remove(i);
+        vectMarks.remove(i);
+        cBxIntervals->removeItem(i-1);
+        cBxIntervals->removeItem(i-1);
+        cBxIntervals->insertItem(i-1, QString::number(vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
+    }
+    // We can't remove 2 fundamental marks (the beginning and the end):
+    if(vectMarks.length() == 2)
+        pBtnRemoveMark->setEnabled(false);
 }
 
 void MainWindow::cBxMarkTypeCurrentIndexChanged(const QString & text)
