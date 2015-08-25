@@ -43,6 +43,7 @@ public slots:
     void pBtnSaveMarkersClicked();
     void pBtnLoadMarkersClicked();
     void pBtnPlaceMarkClicked();
+    void pBtnRemoveMarkClicked();
     void pBtnZoomInClicked();
     void pBtnZoomOutClicked();
     void cBxMarkTypeCurrentIndexChanged(const QString & text);
@@ -53,7 +54,7 @@ public slots:
 private:
     // GIU members:
     RenderArea  *graphArea;
-    QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut;
+    QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut, *pBtnRemoveMark;
     QComboBox   *cBxMarkType, *cBxWindowSize, *cBxIntervals;
     QLabel      *lbCurrentWavFile, *lbWavFileSamplRate, *lbWavFileBitsPerSample, *lbMarkerPosition, *lbSamplesInWav;
     QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample, *edMarkerPosition, *edSamplesInWav;
