@@ -87,12 +87,12 @@ void RenderArea::drawSamples(QPainter &painter)
     */
     if(vectSamples->length() > 0) {
         double hd_cast = static_cast<double>(this->height())/2;
-//        QVector<QPoint> pointsToDraw(vectSamples->length());
         QVector<QPoint> pointsToDraw(rightVisibleBorder - leftVisibleBorder+1);
         for(int i=0; i < pointsToDraw.length(); i++) {
             pointsToDraw[i].setX(qFloor(i/xScaleSamples));
             pointsToDraw[i].setY(-yScaleSamples*vectSamples->data()[i+leftVisibleBorder]+hd_cast);
         }
+
         // Before selected interval:
         painter.setPen(*pnCurve);
         int pointsCntBefore = (vectMarks->at(selectedInterval) < rightVisibleBorder? vectMarks->at(selectedInterval) : rightVisibleBorder) - leftVisibleBorder;
