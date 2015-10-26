@@ -87,28 +87,78 @@ void RenderArea::drawSamples(QPainter &painter)
     */
     if(vectSamples->length() > 0) {
         double hd_cast = static_cast<double>(this->height())/2;
-        QVector<QPoint> pointsToDraw(rightVisibleBorder - leftVisibleBorder+1);
-        for(int i=0; i < pointsToDraw.length(); i++) {
-            pointsToDraw[i].setX(qFloor(i/xScaleSamples));
-            pointsToDraw[i].setY(-yScaleSamples*vectSamples->data()[i+leftVisibleBorder]+hd_cast);
+//        int extremaCnt = 0;
+//        for(int k=1; k < vectSamples->length()-1; k++) {
+//            if(((vectSamples->data()[k] > vectSamples->data()[k-1]) && (vectSamples->data()[k] >= vectSamples->data()[k+1]))
+//                    ||
+//               ((vectSamples->data()[k] < vectSamples->data()[k-1]) && (vectSamples->data()[k] <= vectSamples->data()[k+1])))
+//                extremaCnt++;
+//        }
+        // ---------------------
+        // New drawing algorithm:
+        // ---------------------
+        int samplesPerPixel = qFloor(xScaleSamples);
+        QVector<QPoint> pointsToDraw(this->width()*4);
+        int pointsToDrawIndex = 0;
+        for(int i=0; i<this->width(); i++) {
+            // Left-most sample:
+            pointsToDraw[pointsToDrawIndex].setX(i);
+            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*vectSamples->data()[i*samplesPerPixel+leftVisibleBorder]+hd_cast);
+            pointsToDrawIndex++;
+            // Highest and lowest samples:
+            int highestSample = vectSamples->data()[i*samplesPerPixel + leftVisibleBorder];
+            int lowestSample = vectSamples->data()[i*samplesPerPixel + leftVisibleBorder];
+            for(int j = i*samplesPerPixel + leftVisibleBorder + 1;
+                j < i*samplesPerPixel + leftVisibleBorder + samplesPerPixel;
+                j++)
+            {
+                if(vectSamples->data()[j] > highestSample)
+                    highestSample = vectSamples->data()[j];
+                if(vectSamples->data()[j] < lowestSample)
+                    lowestSample = vectSamples->data()[j];
+            }
+            // Add highest and lowest samples :
+            pointsToDraw[pointsToDrawIndex].setX(i);
+            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*highestSample + hd_cast);
+            pointsToDrawIndex++;
+            pointsToDraw[pointsToDrawIndex].setX(i);
+            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*lowestSample + hd_cast);
+            pointsToDrawIndex++;
+            // Right-most sample:
+            pointsToDraw[pointsToDrawIndex].setX(i);
+            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*vectSamples->data()[(i+1)*samplesPerPixel - 1 +leftVisibleBorder]+hd_cast);
+            pointsToDrawIndex++;
         }
+        // Remove unnecessary points:
+        //        pointsToDraw.remove(pointsToDrawIndex, pointsToDraw.length() - pointsToDrawIndex);
+        // Draw polyline:
+        painter.drawPolyline(pointsToDraw.data(), pointsToDraw.length());
+// ---------------------
+// Old drawing algorithm:
+// ---------------------
 
-        // Before selected interval:
-        painter.setPen(*pnCurve);
-        int pointsCntBefore = (vectMarks->at(selectedInterval) < rightVisibleBorder? vectMarks->at(selectedInterval) : rightVisibleBorder) - leftVisibleBorder;
-        pointsCntBefore = pointsCntBefore > 0? pointsCntBefore : 0;
-        painter.drawPolyline(pointsToDraw.data(), pointsCntBefore);
-        // Inside selected interval:
-        painter.setPen(*pnCurveSelected);
-        int pointsCntInside = (vectMarks->at(selectedInterval+1) < rightVisibleBorder? vectMarks->at(selectedInterval+1) : rightVisibleBorder) -
-                              (vectMarks->at(selectedInterval)   > leftVisibleBorder?  vectMarks->at(selectedInterval)   : leftVisibleBorder);
-        pointsCntInside = pointsCntInside > 0? pointsCntInside : 0;
-        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore, pointsCntInside);
-        // After selected interval:
-        painter.setPen(*pnCurve);
-        int pointsCntAfter = rightVisibleBorder - (vectMarks->at(selectedInterval+1) > leftVisibleBorder? vectMarks->at(selectedInterval+1) : leftVisibleBorder) + 1;
-        pointsCntAfter = pointsCntAfter > 0? pointsCntAfter : 0;
-        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore + pointsCntInside, pointsCntAfter);
+//        QVector<QPoint> pointsToDraw(rightVisibleBorder - leftVisibleBorder+1);
+//        for(int i=0; i < pointsToDraw.length(); i++) {
+//            pointsToDraw[i].setX(qFloor(i/xScaleSamples));
+//            pointsToDraw[i].setY(-yScaleSamples*vectSamples->data()[i+leftVisibleBorder]+hd_cast);
+//        }
+
+//        // Before selected interval:
+//        painter.setPen(*pnCurve);
+//        int pointsCntBefore = (vectMarks->at(selectedInterval) < rightVisibleBorder? vectMarks->at(selectedInterval) : rightVisibleBorder) - leftVisibleBorder;
+//        pointsCntBefore = pointsCntBefore > 0? pointsCntBefore : 0;
+//        painter.drawPolyline(pointsToDraw.data(), pointsCntBefore);
+//        // Inside selected interval:
+//        painter.setPen(*pnCurveSelected);
+//        int pointsCntInside = (vectMarks->at(selectedInterval+1) < rightVisibleBorder? vectMarks->at(selectedInterval+1) : rightVisibleBorder) -
+//                              (vectMarks->at(selectedInterval)   > leftVisibleBorder?  vectMarks->at(selectedInterval)   : leftVisibleBorder);
+//        pointsCntInside = pointsCntInside > 0? pointsCntInside : 0;
+//        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore, pointsCntInside);
+//        // After selected interval:
+//        painter.setPen(*pnCurve);
+//        int pointsCntAfter = rightVisibleBorder - (vectMarks->at(selectedInterval+1) > leftVisibleBorder? vectMarks->at(selectedInterval+1) : leftVisibleBorder) + 1;
+//        pointsCntAfter = pointsCntAfter > 0? pointsCntAfter : 0;
+//        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore + pointsCntInside, pointsCntAfter);
     }
 }
 
