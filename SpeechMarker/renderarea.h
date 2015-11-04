@@ -5,6 +5,7 @@
 #include <QPixmap>
 #include <QVector>
 #include <QMouseEvent>
+#include <QPair>
 
 class RenderArea : public QWidget
 {
@@ -19,6 +20,8 @@ public:
     void setSelectedInterval(int ind) {selectedInterval=ind;}
     void setVisibleBorders(int left, int right) {leftVisibleBorder = left; rightVisibleBorder = right;}
     void updatePlot();
+    // Prepare pre-calsulated extrema arrays for drawing:
+    void preparePrecalculatedArrays();
 signals:
     void markerPositionChanged(int newPosition);
 public slots:
@@ -38,6 +41,8 @@ private:
     // -----------------------------------------
     const QVector<int> *vectSamples, *vectMarks;
     // -----------------------------------------
+    QVector< QPair<int, int> > vectExtrema64, vectExtrema128, vectExtrema256, vectExtrema512, vectExtrema1024, vectExtrema2048, vectExtrema4096, vectExtrema8192, vectExtrema16384;
+    // -----------------------------------------
     double xScaleSamples, yScaleSamples;
     int selectedInterval;
     int leftVisibleBorder, rightVisibleBorder;
@@ -47,6 +52,7 @@ private:
     void drawAxis(QPainter &painter);
     void drawSamples(QPainter &painter);
     void drawMarks(QPainter &painter);
+    void prepareExtremaArray(QVector< QPair<int, int> > *vectExtrema, int samplesPerPixel);
 };
 
 #endif // RENDERAREA_H

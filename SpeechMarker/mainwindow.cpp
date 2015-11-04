@@ -366,7 +366,10 @@ void MainWindow::pBtnLoadWavClicked()
 
             visibleSamplesCnt = vectSamples.length();
             graphArea->setVisibleBorders(0, vectSamples.length()-1);
-
+            //-------
+            // We prepare arrays of signal extrema for fast drawing:
+            graphArea->preparePrecalculatedArrays();
+            //-------
             graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
             // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
             edMarkerPosition->blockSignals(true);
