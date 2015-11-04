@@ -198,14 +198,14 @@ void RenderArea::drawSamples(QPainter &painter)
         for(int i=startingIndex; i<endingIndex; i++){
             // Minimal value for i-th window:
             int pixel_x = qFloor((vectExtrema->data()[i].first - leftVisibleBorder)/xScaleSamples);
-            pointsToDraw.data()[i*2].setX(pixel_x);
+            pointsToDraw.data()[(i-startingIndex)*2].setX(pixel_x);
             int pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].first]+hd_cast;
-            pointsToDraw.data()[i*2].setY(pixel_y);
+            pointsToDraw.data()[(i-startingIndex)*2].setY(pixel_y);
             // Maximal value for i-th window:
             pixel_x = qFloor((vectExtrema->data()[i].second - leftVisibleBorder)/xScaleSamples);
-            pointsToDraw.data()[i*2+1].setX(pixel_x);
+            pointsToDraw.data()[(i-startingIndex)*2+1].setX(pixel_x);
             pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].second]+hd_cast;
-            pointsToDraw.data()[i*2+1].setY(pixel_y);
+            pointsToDraw.data()[(i-startingIndex)*2+1].setY(pixel_y);
         }
         painter.drawPolyline(pointsToDraw.data(), pointsToDraw.length());
     }
