@@ -88,16 +88,6 @@ void RenderArea::drawSamples(QPainter &painter)
     if(vectSamples->length() > 0) {
         double hd_cast = static_cast<double>(this->height())/2;
 // ---------------------
-// Count extrema:
-// ---------------------
-        /*int extremaCnt = 0;
-        for(int k=1; k < vectSamples->length()-1; k++) {
-            if(((vectSamples->data()[k] > vectSamples->data()[k-1]) && (vectSamples->data()[k] >= vectSamples->data()[k+1]))
-                    ||
-               ((vectSamples->data()[k] < vectSamples->data()[k-1]) && (vectSamples->data()[k] <= vectSamples->data()[k+1])))
-                extremaCnt++;
-        }*/
-// ---------------------
 // New drawing algorithm (based on extrema):
 // ---------------------
         /*
