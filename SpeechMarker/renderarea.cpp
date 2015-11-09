@@ -212,14 +212,23 @@ void RenderArea::prepareExtremaArray(QVector<QPair<int, int> > *vectExtrema, int
 
 void RenderArea::preparePrecalculatedArrays()
 {
+    vectExtrema64.clear();
     prepareExtremaArray(&vectExtrema64, 64);
+    vectExtrema128.clear();
     prepareExtremaArray(&vectExtrema128, 128);
+    vectExtrema256.clear();
     prepareExtremaArray(&vectExtrema256, 256);
+    vectExtrema512.clear();
     prepareExtremaArray(&vectExtrema512, 512);
+    vectExtrema1024.clear();
     prepareExtremaArray(&vectExtrema1024, 1024);
+    vectExtrema2048.clear();
     prepareExtremaArray(&vectExtrema2048, 2048);
+    vectExtrema4096.clear();
     prepareExtremaArray(&vectExtrema4096, 4096);
+    vectExtrema8192.clear();
     prepareExtremaArray(&vectExtrema8192, 8192);
+    vectExtrema16384.clear();
     prepareExtremaArray(&vectExtrema16384, 16384);
 }
 
