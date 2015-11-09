@@ -152,6 +152,9 @@ void RenderArea::drawSamples(QPainter &painter)
             pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].second]+hd_cast;
             pointsToDraw.data()[(i-startingIndex)*2+1].setY(pixel_y);
         }
+        painter.setPen(*pnCurve);
+        int selectedIntervalLeftIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval)) / samplesPerPixel[vectExtremaIndex]);
+        int selectedIntervalRightIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval+1)) / samplesPerPixel[vectExtremaIndex]);
         painter.drawPolyline(pointsToDraw.data(), pointsToDraw.length());
     }
 }
