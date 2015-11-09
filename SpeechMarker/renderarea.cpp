@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QtMath>
 #include <QVariant>
+#include <algorithm>
 
 RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), selectedInterval(0), QWidget(parent)
 {
@@ -140,12 +141,12 @@ void RenderArea::drawSamples(QPainter &painter)
         int endingIndex = qAbs(static_cast<double>(rightVisibleBorder) / samplesPerPixelValues[vectExtremaIndex]);
         QVector<QPoint> pointsToDraw((endingIndex - startingIndex + 1)*2);    // in every pixel we draw maximal and minimal values
         for(int i=startingIndex; i<=endingIndex; i++){
-            // Minimal value for i-th window:
+            // First extremum (either max or min) for the i-th window:
             int pixel_x = qFloor((vectExtrema->data()[i].first - leftVisibleBorder)/xScaleSamples);
             pointsToDraw.data()[(i-startingIndex)*2].setX(pixel_x);
             int pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].first]+hd_cast;
             pointsToDraw.data()[(i-startingIndex)*2].setY(pixel_y);
-            // Maximal value for i-th window:
+            // Second extremum for the i-th window:
             pixel_x = qFloor((vectExtrema->data()[i].second - leftVisibleBorder)/xScaleSamples);
             pointsToDraw.data()[(i-startingIndex)*2+1].setX(pixel_x);
             pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].second]+hd_cast;
@@ -193,8 +194,8 @@ void RenderArea::prepareExtremaArray(QVector<QPair<int, int> > *vectExtrema, int
     int vectLen128 = qCeil(vectSamples->length() / static_cast<double>(samplesPerPixel));
     vectExtrema->resize(vectLen128);
     for(int i=0; i < vectExtrema->length(); i++) {
-        vectExtrema->data()[i].first = i*samplesPerPixel;     // Index of a minimal value for the i-th window
-        vectExtrema->data()[i].second = i*samplesPerPixel;    // Index of a maximal value for the i-th window
+        vectExtrema->data()[i].first = i*samplesPerPixel;     // Index of the 1-st extremum for the i-th window
+        vectExtrema->data()[i].second = i*samplesPerPixel;    // Index of the 2-nd extremum for the i-th window
         for(int j=i*samplesPerPixel + 1; (j < (i+1)*samplesPerPixel) && (j < vectSamples->length()); j++) {
             // Find index of a minimal number in the i-th window:
             if(vectSamples->data()[j] < vectSamples->data()[vectExtrema->data()[i].first])
@@ -203,6 +204,9 @@ void RenderArea::prepareExtremaArray(QVector<QPair<int, int> > *vectExtrema, int
             if(vectSamples->data()[j] > vectSamples->data()[vectExtrema->data()[i].second])
                 vectExtrema->data()[i].second = j;
         }
+        // Correct order for first and second if necessary:
+        if(vectExtrema->data()[i].first > vectExtrema->data()[i].second)
+            std::swap(vectExtrema->data()[i].first, vectExtrema->data()[i].second);
     }
 }
 
