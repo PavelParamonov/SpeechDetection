@@ -136,16 +136,8 @@ void RenderArea::drawSamples(QPainter &painter)
             case 8: vectExtrema = &vectExtrema16384; break;
         }
         // ------------------------------------------------
-        int startingIndex = 0;
-        int endingIndex = vectExtrema->length()-1;
-        while((vectExtrema->data()[startingIndex].first < leftVisibleBorder) ||
-              (vectExtrema->data()[startingIndex].second < leftVisibleBorder))
-            startingIndex++;
-        while((vectExtrema->data()[endingIndex].first > rightVisibleBorder) ||
-              (vectExtrema->data()[endingIndex].second > rightVisibleBorder))
-            endingIndex--;
-        double PREstartingIndex = static_cast<double>(leftVisibleBorder) / samplesPerPixelValues[vectExtremaIndex];
-        double PREendingIndex = static_cast<double>(rightVisibleBorder) / static_cast<double>(samplesPerPixelValues[vectExtremaIndex]);
+        int startingIndex = qAbs(static_cast<double>(leftVisibleBorder) / samplesPerPixelValues[vectExtremaIndex]);
+        int endingIndex = qAbs(static_cast<double>(rightVisibleBorder) / static_cast<double>(samplesPerPixelValues[vectExtremaIndex]));
         QVector<QPoint> pointsToDraw((endingIndex - startingIndex + 1)*2);    // in every pixel we draw maximal and minimal values
         for(int i=startingIndex; i<=endingIndex; i++){
             // Minimal value for i-th window:
