@@ -88,46 +88,6 @@ void RenderArea::drawSamples(QPainter &painter)
     if(vectSamples->length() > 0) {
         double hd_cast = static_cast<double>(this->height())/2;
 // ---------------------
-// New drawing algorithm (based on extrema):
-// ---------------------
-        /*
-        int samplesPerPixel = qFloor(xScaleSamples);
-        QVector<QPoint> pointsToDraw(this->width()*4);
-        int pointsToDrawIndex = 0;
-        for(int i=0; i<this->width(); i++) {
-            // Left-most sample:
-            pointsToDraw[pointsToDrawIndex].setX(i);
-            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*vectSamples->data()[i*samplesPerPixel+leftVisibleBorder]+hd_cast);
-            pointsToDrawIndex++;
-            // Highest and lowest samples:
-            int highestSample = vectSamples->data()[i*samplesPerPixel + leftVisibleBorder];
-            int lowestSample = vectSamples->data()[i*samplesPerPixel + leftVisibleBorder];
-            for(int j = i*samplesPerPixel + leftVisibleBorder + 1;
-                j < i*samplesPerPixel + leftVisibleBorder + samplesPerPixel;
-                j++)
-            {
-                if(vectSamples->data()[j] > highestSample)
-                    highestSample = vectSamples->data()[j];
-                if(vectSamples->data()[j] < lowestSample)
-                    lowestSample = vectSamples->data()[j];
-            }
-            // Add highest and lowest samples :
-            pointsToDraw[pointsToDrawIndex].setX(i);
-            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*highestSample + hd_cast);
-            pointsToDrawIndex++;
-            pointsToDraw[pointsToDrawIndex].setX(i);
-            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*lowestSample + hd_cast);
-            pointsToDrawIndex++;
-            // Right-most sample:
-            pointsToDraw[pointsToDrawIndex].setX(i);
-            pointsToDraw[pointsToDrawIndex].setY(-yScaleSamples*vectSamples->data()[(i+1)*samplesPerPixel - 1 +leftVisibleBorder]+hd_cast);
-            pointsToDrawIndex++;
-        }*/
-        // Remove unnecessary points:
-        //        pointsToDraw.remove(pointsToDrawIndex, pointsToDraw.length() - pointsToDrawIndex);
-        // Draw polyline:
-        //painter.drawPolyline(pointsToDraw.data(), pointsToDraw.length());
-// ---------------------
 // Old drawing algorithm:
 // ---------------------
         /*QVector<QPoint> pointsToDraw(rightVisibleBorder - leftVisibleBorder+1);
