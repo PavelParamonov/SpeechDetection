@@ -178,14 +178,16 @@ void RenderArea::drawSamples(QPainter &painter)
         // ------------------------------------------------
         int startingIndex = 0;
         int endingIndex = vectExtrema->length()-1;
-        while((vectExtrema->data()[startingIndex].first < leftVisibleBorder) &&
+        while((vectExtrema->data()[startingIndex].first < leftVisibleBorder) ||
               (vectExtrema->data()[startingIndex].second < leftVisibleBorder))
             startingIndex++;
-        while((vectExtrema->data()[endingIndex].first > rightVisibleBorder) &&
+        while((vectExtrema->data()[endingIndex].first > rightVisibleBorder) ||
               (vectExtrema->data()[endingIndex].second > rightVisibleBorder))
             endingIndex--;
-        QVector<QPoint> pointsToDraw((endingIndex - startingIndex)*2);    // in every pixel we draw maximal and minimal values
-        for(int i=startingIndex; i<endingIndex; i++){
+        double PREstartingIndex = static_cast<double>(leftVisibleBorder) / samplesPerPixelValues[vectExtremaIndex];
+        double PREendingIndex = static_cast<double>(rightVisibleBorder) / static_cast<double>(samplesPerPixelValues[vectExtremaIndex]);
+        QVector<QPoint> pointsToDraw((endingIndex - startingIndex + 1)*2);    // in every pixel we draw maximal and minimal values
+        for(int i=startingIndex; i<=endingIndex; i++){
             // Minimal value for i-th window:
             int pixel_x = qFloor((vectExtrema->data()[i].first - leftVisibleBorder)/xScaleSamples);
             pointsToDraw.data()[(i-startingIndex)*2].setX(pixel_x);
