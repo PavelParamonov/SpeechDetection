@@ -88,37 +88,10 @@ void RenderArea::drawSamples(QPainter &painter)
     */
     if(vectSamples->length() > 0) {
         double hd_cast = static_cast<double>(this->height())/2;
-// ---------------------
-// Old drawing algorithm:
-// ---------------------
-        /*QVector<QPoint> pointsToDraw(rightVisibleBorder - leftVisibleBorder+1);
-        for(int i=0; i < pointsToDraw.length(); i++) {
-            pointsToDraw[i].setX(qFloor(i/xScaleSamples));
-            pointsToDraw[i].setY(-yScaleSamples*vectSamples->data()[i+leftVisibleBorder]+hd_cast);
-        }
 
-        // Before selected interval:
-        painter.setPen(*pnCurve);
-        int pointsCntBefore = (vectMarks->at(selectedInterval) < rightVisibleBorder? vectMarks->at(selectedInterval) : rightVisibleBorder) - leftVisibleBorder;
-        pointsCntBefore = pointsCntBefore > 0? pointsCntBefore : 0;
-        painter.drawPolyline(pointsToDraw.data(), pointsCntBefore);
-        // Inside selected interval:
-        painter.setPen(*pnCurveSelected);
-        int pointsCntInside = (vectMarks->at(selectedInterval+1) < rightVisibleBorder? vectMarks->at(selectedInterval+1) : rightVisibleBorder) -
-                              (vectMarks->at(selectedInterval)   > leftVisibleBorder?  vectMarks->at(selectedInterval)   : leftVisibleBorder);
-        pointsCntInside = pointsCntInside > 0? pointsCntInside : 0;
-        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore, pointsCntInside);
-        // After selected interval:
-        painter.setPen(*pnCurve);
-        int pointsCntAfter = rightVisibleBorder - (vectMarks->at(selectedInterval+1) > leftVisibleBorder? vectMarks->at(selectedInterval+1) : leftVisibleBorder) + 1;
-        pointsCntAfter = pointsCntAfter > 0? pointsCntAfter : 0;
-        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore + pointsCntInside, pointsCntAfter);*/
-// ---------------------
-// Brand-new algorithm (extrema-based drawing):
-// ---------------------
         int samplesPerPixel = qCeil((rightVisibleBorder - leftVisibleBorder+1) / static_cast<double>(this->width()));
         // ------------------------------------------------
-        // Choose array with the most suitable window size:
+        // Choose array with the most suitable window size (samples per pixel value):
         const QVector< QPair <int, int> > *vectExtrema = 0;
         int samplesPerPixelValues[] = {64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384};
         int vectExtremaIndex = 0;
@@ -152,10 +125,24 @@ void RenderArea::drawSamples(QPainter &painter)
             pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].second]+hd_cast;
             pointsToDraw.data()[(i-startingIndex)*2+1].setY(pixel_y);
         }
+        // Draw curve before selected interval:
         painter.setPen(*pnCurve);
-        int selectedIntervalLeftIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval)) / samplesPerPixel[vectExtremaIndex]);
-        int selectedIntervalRightIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval+1)) / samplesPerPixel[vectExtremaIndex]);
-        painter.drawPolyline(pointsToDraw.data(), pointsToDraw.length());
+        int selectedIntervalLeftIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval)) / samplesPerPixelValues[vectExtremaIndex]);
+        int selectedIntervalRightIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval+1)) / samplesPerPixelValues[vectExtremaIndex]);
+        int pointsCntBefore = (selectedIntervalLeftIndex < endingIndex? selectedIntervalLeftIndex : endingIndex) - startingIndex;
+        pointsCntBefore = pointsCntBefore > 0? pointsCntBefore*2 : 0;   // We draw TWO points for every pixel (max and min values)
+        painter.drawPolyline(pointsToDraw.data(), pointsCntBefore);
+        // Draw curve inside selected interval:
+        painter.setPen(*pnCurveSelected);
+        int pointsCntInside = (selectedIntervalRightIndex < endingIndex? selectedIntervalRightIndex : endingIndex) -
+                                     (selectedIntervalLeftIndex   > startingIndex?  selectedIntervalLeftIndex   : startingIndex);
+        pointsCntInside = pointsCntInside > 0? pointsCntInside*2 : 0;
+        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore, pointsCntInside);
+        // Draw curve after selected interval:
+        painter.setPen(*pnCurve);
+        int pointsCntAfter = endingIndex - (selectedIntervalRightIndex > startingIndex? selectedIntervalRightIndex : startingIndex) + 1;
+        pointsCntAfter = pointsCntAfter > 0? pointsCntAfter*2 : 0;
+        painter.drawPolyline(pointsToDraw.data() + pointsCntBefore + pointsCntInside, pointsCntAfter);
     }
 }
 
