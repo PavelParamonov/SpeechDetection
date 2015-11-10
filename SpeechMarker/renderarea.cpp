@@ -134,13 +134,14 @@ void RenderArea::drawSamples(QPainter &painter)
         painter.drawPolyline(pointsToDraw.data(), pointsCntBefore);
         // Draw curve inside selected interval:
         painter.setPen(*pnCurveSelected);
+        // We assume that both borders of selected interval belong to this interval (that's why "+1"):
         int pointsCntInside = (selectedIntervalRightIndex < endingIndex? selectedIntervalRightIndex : endingIndex) -
-                                     (selectedIntervalLeftIndex   > startingIndex?  selectedIntervalLeftIndex   : startingIndex);
+                                     (selectedIntervalLeftIndex   > startingIndex?  selectedIntervalLeftIndex   : startingIndex) + 1;
         pointsCntInside = pointsCntInside > 0? pointsCntInside*2 : 0;
         painter.drawPolyline(pointsToDraw.data() + pointsCntBefore, pointsCntInside);
         // Draw curve after selected interval:
         painter.setPen(*pnCurve);
-        int pointsCntAfter = endingIndex - (selectedIntervalRightIndex > startingIndex? selectedIntervalRightIndex : startingIndex) + 1;
+        int pointsCntAfter = endingIndex - (selectedIntervalRightIndex > startingIndex? selectedIntervalRightIndex : startingIndex);
         pointsCntAfter = pointsCntAfter > 0? pointsCntAfter*2 : 0;
         painter.drawPolyline(pointsToDraw.data() + pointsCntBefore + pointsCntInside, pointsCntAfter);
     }
