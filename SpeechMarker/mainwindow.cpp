@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
     cBxWindowSize->addItem("10 ms");
     cBxWindowSize->addItem("16 ms");
     cBxWindowSize->addItem("20 ms");
+    sBarPlotScroller = new QScrollBar(Qt::Horizontal);
+    sBarPlotScroller->setEnabled(false);
 
     hBoxLayMarkerPosition = new QHBoxLayout();
     hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
@@ -96,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     vBoxLayRenderControl = new QVBoxLayout();
     vBoxLayRenderControl->addWidget(graphArea);
+    vBoxLayRenderControl->addWidget(sBarPlotScroller);
     vBoxLayRenderControl->addLayout(hBoxLayMarkerPosition);
     vBoxLayRenderControl->addLayout(hBoxLayControlButtons);
     vBoxLayRenderControl->addLayout(hBoxLayWavFileLabel);
@@ -406,6 +409,7 @@ void MainWindow::pBtnLoadWavClicked()
             cBxMarkType->setEnabled(true);
             cBxWindowSize->setEnabled(true);
             pBtnPlaceMark->setEnabled(true);
+            sBarPlotScroller->setEnabled(true);
             // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
             edMarkerPosition->blockSignals(false);
             cBxIntervals->blockSignals(false);

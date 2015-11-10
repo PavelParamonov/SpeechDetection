@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QScrollBar>
 #include <QVector>
 
 class RenderArea;
@@ -60,6 +61,7 @@ private:
     QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample, *edMarkerPosition, *edSamplesInWav;
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
     QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain;
+    QScrollBar  *sBarPlotScroller;
     // Other members:
     QVector<int>    vectSamples, vectMarks;
     QVector<QString> vectLabels;
