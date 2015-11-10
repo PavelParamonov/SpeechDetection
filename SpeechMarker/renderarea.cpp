@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QtMath>
 #include <QVariant>
+#include <algorithm>
 
 RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), selectedInterval(0), QWidget(parent)
 {
@@ -87,27 +88,61 @@ void RenderArea::drawSamples(QPainter &painter)
     */
     if(vectSamples->length() > 0) {
         double hd_cast = static_cast<double>(this->height())/2;
-        QVector<QPoint> pointsToDraw(rightVisibleBorder - leftVisibleBorder+1);
-        for(int i=0; i < pointsToDraw.length(); i++) {
-            pointsToDraw[i].setX(qFloor(i/xScaleSamples));
-            pointsToDraw[i].setY(-yScaleSamples*vectSamples->data()[i+leftVisibleBorder]+hd_cast);
-        }
 
-        // Before selected interval:
+        int samplesPerPixel = qCeil((rightVisibleBorder - leftVisibleBorder+1) / static_cast<double>(this->width()));
+        // ------------------------------------------------
+        // Choose array with the most suitable window size (samples per pixel value):
+        const QVector< QPair <int, int> > *vectExtrema = 0;
+        int samplesPerPixelValues[] = {64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384};
+        int vectExtremaIndex = 0;
+        for(int i=0; i<9; i++)
+            if(qAbs(samplesPerPixel-samplesPerPixelValues[i]) < qAbs(samplesPerPixel-samplesPerPixelValues[vectExtremaIndex]))
+                vectExtremaIndex = i;
+        switch(vectExtremaIndex) {
+            case 0: vectExtrema = &vectExtrema64; break;
+            case 1: vectExtrema = &vectExtrema128; break;
+            case 2: vectExtrema = &vectExtrema256; break;
+            case 3: vectExtrema = &vectExtrema512; break;
+            case 4: vectExtrema = &vectExtrema1024; break;
+            case 5: vectExtrema = &vectExtrema2048; break;
+            case 6: vectExtrema = &vectExtrema4096; break;
+            case 7: vectExtrema = &vectExtrema8192; break;
+            case 8: vectExtrema = &vectExtrema16384; break;
+        }
+        // ------------------------------------------------
+        int startingIndex = qAbs(static_cast<double>(leftVisibleBorder) / samplesPerPixelValues[vectExtremaIndex]);
+        int endingIndex = qAbs(static_cast<double>(rightVisibleBorder) / samplesPerPixelValues[vectExtremaIndex]);
+        QVector<QPoint> pointsToDraw((endingIndex - startingIndex + 1)*2);    // in every pixel we draw maximal and minimal values
+        for(int i=startingIndex; i<=endingIndex; i++){
+            // First extremum (either max or min) for the i-th window:
+            int pixel_x = qFloor((vectExtrema->data()[i].first - leftVisibleBorder)/xScaleSamples);
+            pointsToDraw.data()[(i-startingIndex)*2].setX(pixel_x);
+            int pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].first]+hd_cast;
+            pointsToDraw.data()[(i-startingIndex)*2].setY(pixel_y);
+            // Second extremum for the i-th window:
+            pixel_x = qFloor((vectExtrema->data()[i].second - leftVisibleBorder)/xScaleSamples);
+            pointsToDraw.data()[(i-startingIndex)*2+1].setX(pixel_x);
+            pixel_y = -yScaleSamples*vectSamples->data()[vectExtrema->data()[i].second]+hd_cast;
+            pointsToDraw.data()[(i-startingIndex)*2+1].setY(pixel_y);
+        }
+        // Draw curve before selected interval:
         painter.setPen(*pnCurve);
-        int pointsCntBefore = (vectMarks->at(selectedInterval) < rightVisibleBorder? vectMarks->at(selectedInterval) : rightVisibleBorder) - leftVisibleBorder;
-        pointsCntBefore = pointsCntBefore > 0? pointsCntBefore : 0;
+        int selectedIntervalLeftIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval)) / samplesPerPixelValues[vectExtremaIndex]);
+        int selectedIntervalRightIndex = qAbs(static_cast<double>(vectMarks->at(selectedInterval+1)) / samplesPerPixelValues[vectExtremaIndex]);
+        int pointsCntBefore = (selectedIntervalLeftIndex < endingIndex? selectedIntervalLeftIndex : endingIndex) - startingIndex;
+        pointsCntBefore = pointsCntBefore > 0? pointsCntBefore*2 : 0;   // We draw TWO points for every pixel (max and min values)
         painter.drawPolyline(pointsToDraw.data(), pointsCntBefore);
-        // Inside selected interval:
+        // Draw curve inside selected interval:
         painter.setPen(*pnCurveSelected);
-        int pointsCntInside = (vectMarks->at(selectedInterval+1) < rightVisibleBorder? vectMarks->at(selectedInterval+1) : rightVisibleBorder) -
-                              (vectMarks->at(selectedInterval)   > leftVisibleBorder?  vectMarks->at(selectedInterval)   : leftVisibleBorder);
-        pointsCntInside = pointsCntInside > 0? pointsCntInside : 0;
+        // We assume that both borders of selected interval belong to this interval (that's why "+1"):
+        int pointsCntInside = (selectedIntervalRightIndex < endingIndex? selectedIntervalRightIndex : endingIndex) -
+                                     (selectedIntervalLeftIndex   > startingIndex?  selectedIntervalLeftIndex   : startingIndex) + 1;
+        pointsCntInside = pointsCntInside > 0? pointsCntInside*2 : 0;
         painter.drawPolyline(pointsToDraw.data() + pointsCntBefore, pointsCntInside);
-        // After selected interval:
+        // Draw curve after selected interval:
         painter.setPen(*pnCurve);
-        int pointsCntAfter = rightVisibleBorder - (vectMarks->at(selectedInterval+1) > leftVisibleBorder? vectMarks->at(selectedInterval+1) : leftVisibleBorder) + 1;
-        pointsCntAfter = pointsCntAfter > 0? pointsCntAfter : 0;
+        int pointsCntAfter = endingIndex - (selectedIntervalRightIndex > startingIndex? selectedIntervalRightIndex : startingIndex);
+        pointsCntAfter = pointsCntAfter > 0? pointsCntAfter*2 : 0;
         painter.drawPolyline(pointsToDraw.data() + pointsCntBefore + pointsCntInside, pointsCntAfter);
     }
 }
@@ -143,6 +178,49 @@ void RenderArea::updatePlot()
     drawMarks(painter);
     drawMarker(painter);
     this->update();
+}
+
+void RenderArea::prepareExtremaArray(QVector<QPair<int, int> > *vectExtrema, int samplesPerPixel)
+{
+    int vectLen128 = qCeil(vectSamples->length() / static_cast<double>(samplesPerPixel));
+    vectExtrema->resize(vectLen128);
+    for(int i=0; i < vectExtrema->length(); i++) {
+        vectExtrema->data()[i].first = i*samplesPerPixel;     // Index of the 1-st extremum for the i-th window
+        vectExtrema->data()[i].second = i*samplesPerPixel;    // Index of the 2-nd extremum for the i-th window
+        for(int j=i*samplesPerPixel + 1; (j < (i+1)*samplesPerPixel) && (j < vectSamples->length()); j++) {
+            // Find index of a minimal number in the i-th window:
+            if(vectSamples->data()[j] < vectSamples->data()[vectExtrema->data()[i].first])
+                vectExtrema->data()[i].first = j;
+            // Find index of a maximal number in the i-th window:
+            if(vectSamples->data()[j] > vectSamples->data()[vectExtrema->data()[i].second])
+                vectExtrema->data()[i].second = j;
+        }
+        // Correct order for first and second if necessary:
+        if(vectExtrema->data()[i].first > vectExtrema->data()[i].second)
+            std::swap(vectExtrema->data()[i].first, vectExtrema->data()[i].second);
+    }
+}
+
+void RenderArea::preparePrecalculatedArrays()
+{
+    vectExtrema64.clear();
+    prepareExtremaArray(&vectExtrema64, 64);
+    vectExtrema128.clear();
+    prepareExtremaArray(&vectExtrema128, 128);
+    vectExtrema256.clear();
+    prepareExtremaArray(&vectExtrema256, 256);
+    vectExtrema512.clear();
+    prepareExtremaArray(&vectExtrema512, 512);
+    vectExtrema1024.clear();
+    prepareExtremaArray(&vectExtrema1024, 1024);
+    vectExtrema2048.clear();
+    prepareExtremaArray(&vectExtrema2048, 2048);
+    vectExtrema4096.clear();
+    prepareExtremaArray(&vectExtrema4096, 4096);
+    vectExtrema8192.clear();
+    prepareExtremaArray(&vectExtrema8192, 8192);
+    vectExtrema16384.clear();
+    prepareExtremaArray(&vectExtrema16384, 16384);
 }
 
  void RenderArea::paintEvent(QPaintEvent *event)
