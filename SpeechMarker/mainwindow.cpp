@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent) :
     cBxWindowSize->addItem("20 ms");
     sBarPlotScroller = new QScrollBar(Qt::Horizontal);
     sBarPlotScroller->setEnabled(false);
+    sBarPlotScroller->setMinimum(0);
+    sBarPlotScroller->setMaximum(0);
+    sBarPlotScroller->setPageStep(1);
 
     hBoxLayMarkerPosition = new QHBoxLayout();
     hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
@@ -410,6 +413,7 @@ void MainWindow::pBtnLoadWavClicked()
             cBxWindowSize->setEnabled(true);
             pBtnPlaceMark->setEnabled(true);
             sBarPlotScroller->setEnabled(true);
+            sBarPlotScroller->setMaximum(vectSamples.length()-1);
             // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
             edMarkerPosition->blockSignals(false);
             cBxIntervals->blockSignals(false);
