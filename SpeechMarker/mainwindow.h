@@ -51,6 +51,7 @@ public slots:
     void cBxIntervalsCurrentIndexChanged(int index);
     void edMarkerPositionTextEdited(const QString &newText);
     void graphAreaMarkerPositionChanged(int newPosition);
+    void sBarPlotScrollerValueChanged(int value);
 
 private:
     // GIU members:

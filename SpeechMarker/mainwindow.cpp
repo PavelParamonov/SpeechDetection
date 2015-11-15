@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QDir>
 
+#include <iostream>
+
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
@@ -66,10 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
     cBxWindowSize->addItem("16 ms");
     cBxWindowSize->addItem("20 ms");
     sBarPlotScroller = new QScrollBar(Qt::Horizontal);
-    sBarPlotScroller->setEnabled(false);
+//    sBarPlotScroller->setEnabled(false);
     sBarPlotScroller->setMinimum(0);
     sBarPlotScroller->setMaximum(0);
-    sBarPlotScroller->setPageStep(1);
 
     hBoxLayMarkerPosition = new QHBoxLayout();
     hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
@@ -125,6 +126,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
     connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
     connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
+    connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
+}
+
+void MainWindow::sBarPlotScrollerValueChanged(int value)
+{
+    int v = value;
+    int mV = sBarPlotScroller->maximum();
+    std::cout<< v << " of " << mV << " hasTracking: " << sBarPlotScroller->hasTracking() <<std::endl;
+    int leftVisibleBorder = sBarPlotScroller->value();
+    int rightVisibleBorder = sBarPlotScroller->value() + visibleSamplesCnt - 1;
+    graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    graphArea->updatePlot();
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -294,6 +307,10 @@ void MainWindow::pBtnZoomInClicked()
     }
     visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    // Set new parameters for scroller:
+    sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt - 1);
+    sBarPlotScroller->setValue(leftVisibleBorder);
+
     graphArea->updatePlot();
 }
 
@@ -312,6 +329,9 @@ void MainWindow::pBtnZoomOutClicked()
     }
     visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    // Set new parameters for scroller:
+    sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt - 1);
+    sBarPlotScroller->setValue(leftVisibleBorder);
     graphArea->updatePlot();
 }
 
@@ -412,8 +432,6 @@ void MainWindow::pBtnLoadWavClicked()
             cBxMarkType->setEnabled(true);
             cBxWindowSize->setEnabled(true);
             pBtnPlaceMark->setEnabled(true);
-            sBarPlotScroller->setEnabled(true);
-            sBarPlotScroller->setMaximum(vectSamples.length()-1);
             // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
             edMarkerPosition->blockSignals(false);
             cBxIntervals->blockSignals(false);
