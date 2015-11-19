@@ -68,6 +68,7 @@ private:
     QVector<QString> vectLabels;
     int markerPosition;
     int visibleSamplesCnt;
+    wavHeader wavFileHeader;
 };
 
 #endif // MAINWINDOW_H

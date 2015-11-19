@@ -130,12 +130,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::sBarPlotScrollerValueChanged(int value)
 {
-    int v = value;
-    int mV = sBarPlotScroller->maximum();
-    int leftVisibleBorder = sBarPlotScroller->value();
-    int rightVisibleBorder = sBarPlotScroller->value() + visibleSamplesCnt - 1;
+    int leftVisibleBorder = value;
+    int rightVisibleBorder = value + visibleSamplesCnt - 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
-    std::cout << "left: " << leftVisibleBorder << "; right: " << rightVisibleBorder << "\n" << std::flush;
     graphArea->updatePlot();
 }
 
@@ -310,9 +307,8 @@ void MainWindow::pBtnZoomInClicked()
     sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
     sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
     sBarPlotScroller->setValue(leftVisibleBorder);
+    sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
     sBarPlotScroller->blockSignals(false);
-    std::cout << "vect lengh: " << vectSamples.length() << "; visibleSamplesCnt = " << visibleSamplesCnt << "\n"<< std::flush;
-    std::cout << sBarPlotScroller->minimum() << " to " << sBarPlotScroller->maximum() << " value: " << sBarPlotScroller->value() << "\n"<< std::flush;
     graphArea->updatePlot();
 }
 
@@ -335,9 +331,8 @@ void MainWindow::pBtnZoomOutClicked()
     sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
     sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
     sBarPlotScroller->setValue(leftVisibleBorder);
+    sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
     sBarPlotScroller->blockSignals(false);
-    std::cout << "vect lengh: " << vectSamples.length() << "; visibleSamplesCnt = " << visibleSamplesCnt << "\n"<< std::flush;
-    std::cout << sBarPlotScroller->minimum() << " to " << sBarPlotScroller->maximum() << " value: " << sBarPlotScroller->value() <<"\n" << std::flush;
     graphArea->updatePlot();
 }
 
@@ -355,7 +350,6 @@ void MainWindow::pBtnLoadWavClicked()
         }
         else {
             wavFile.open(QIODevice::ReadOnly);
-            wavHeader wavFileHeader;
             QDataStream inFile(&wavFile);
             int bytesRead=0;
             bytesRead += inFile.readRawData(wavFileHeader.chunkID, 4);
@@ -438,6 +432,8 @@ void MainWindow::pBtnLoadWavClicked()
             cBxMarkType->setEnabled(true);
             cBxWindowSize->setEnabled(true);
             pBtnPlaceMark->setEnabled(true);
+            sBarPlotScroller->setMinimum(0);
+            sBarPlotScroller->setMaximum(0);
             // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
             edMarkerPosition->blockSignals(false);
             cBxIntervals->blockSignals(false);
