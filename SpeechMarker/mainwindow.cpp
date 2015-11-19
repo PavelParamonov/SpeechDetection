@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QDir>
 
+#include <iostream>
+
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
@@ -65,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent) :
     cBxWindowSize->addItem("10 ms");
     cBxWindowSize->addItem("16 ms");
     cBxWindowSize->addItem("20 ms");
+    sBarPlotScroller = new QScrollBar(Qt::Horizontal);
+    sBarPlotScroller->setMinimum(0);
+    sBarPlotScroller->setMaximum(0);
 
     hBoxLayMarkerPosition = new QHBoxLayout();
     hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
@@ -96,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     vBoxLayRenderControl = new QVBoxLayout();
     vBoxLayRenderControl->addWidget(graphArea);
+    vBoxLayRenderControl->addWidget(sBarPlotScroller);
     vBoxLayRenderControl->addLayout(hBoxLayMarkerPosition);
     vBoxLayRenderControl->addLayout(hBoxLayControlButtons);
     vBoxLayRenderControl->addLayout(hBoxLayWavFileLabel);
@@ -119,6 +125,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
     connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
     connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
+    connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
+}
+
+void MainWindow::sBarPlotScrollerValueChanged(int value)
+{
+    int leftVisibleBorder = value;
+    int rightVisibleBorder = value + visibleSamplesCnt - 1;
+    graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    graphArea->updatePlot();
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -288,6 +303,12 @@ void MainWindow::pBtnZoomInClicked()
     }
     visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    // Set new parameters for scroller:
+    sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
+    sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
+    sBarPlotScroller->setValue(leftVisibleBorder);
+    sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
+    sBarPlotScroller->blockSignals(false);
     graphArea->updatePlot();
 }
 
@@ -306,6 +327,12 @@ void MainWindow::pBtnZoomOutClicked()
     }
     visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
+    // Set new parameters for scroller:
+    sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
+    sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
+    sBarPlotScroller->setValue(leftVisibleBorder);
+    sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
+    sBarPlotScroller->blockSignals(false);
     graphArea->updatePlot();
 }
 
@@ -323,7 +350,6 @@ void MainWindow::pBtnLoadWavClicked()
         }
         else {
             wavFile.open(QIODevice::ReadOnly);
-            wavHeader wavFileHeader;
             QDataStream inFile(&wavFile);
             int bytesRead=0;
             bytesRead += inFile.readRawData(wavFileHeader.chunkID, 4);
@@ -406,6 +432,8 @@ void MainWindow::pBtnLoadWavClicked()
             cBxMarkType->setEnabled(true);
             cBxWindowSize->setEnabled(true);
             pBtnPlaceMark->setEnabled(true);
+            sBarPlotScroller->setMinimum(0);
+            sBarPlotScroller->setMaximum(0);
             // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
             edMarkerPosition->blockSignals(false);
             cBxIntervals->blockSignals(false);

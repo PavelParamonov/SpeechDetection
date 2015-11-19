@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QScrollBar>
 #include <QVector>
 
 class RenderArea;
@@ -50,6 +51,7 @@ public slots:
     void cBxIntervalsCurrentIndexChanged(int index);
     void edMarkerPositionTextEdited(const QString &newText);
     void graphAreaMarkerPositionChanged(int newPosition);
+    void sBarPlotScrollerValueChanged(int value);
 
 private:
     // GIU members:
@@ -60,11 +62,13 @@ private:
     QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample, *edMarkerPosition, *edSamplesInWav;
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
     QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain;
+    QScrollBar  *sBarPlotScroller;
     // Other members:
     QVector<int>    vectSamples, vectMarks;
     QVector<QString> vectLabels;
     int markerPosition;
     int visibleSamplesCnt;
+    wavHeader wavFileHeader;
 };
 
 #endif // MAINWINDOW_H
