@@ -413,6 +413,7 @@ void MainWindow::pBtnLoadWavClicked()
             // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
             vectMarks.append(0);
             vectMarks.append(vectSamples.length()-1);
+            cBxIntervals->clear();
             // When wav file is opened we have one interval from begining to the end:
             cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
             // Initial marker position:
