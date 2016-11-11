@@ -24,6 +24,7 @@ public:
     void preparePrecalculatedArrays();
 signals:
     void markerPositionChanged(int newPosition);
+    void stepsOfPrecalculation(int stepVal);
 public slots:
 
 protected:

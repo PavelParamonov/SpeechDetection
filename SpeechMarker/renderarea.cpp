@@ -205,22 +205,31 @@ void RenderArea::preparePrecalculatedArrays()
 {
     vectExtrema64.clear();
     prepareExtremaArray(&vectExtrema64, 64);
+    emit stepsOfPrecalculation(1);
     vectExtrema128.clear();
     prepareExtremaArray(&vectExtrema128, 128);
+    emit stepsOfPrecalculation(2);
     vectExtrema256.clear();
     prepareExtremaArray(&vectExtrema256, 256);
+    emit stepsOfPrecalculation(3);
     vectExtrema512.clear();
     prepareExtremaArray(&vectExtrema512, 512);
+    emit stepsOfPrecalculation(4);
     vectExtrema1024.clear();
     prepareExtremaArray(&vectExtrema1024, 1024);
+    emit stepsOfPrecalculation(5);
     vectExtrema2048.clear();
     prepareExtremaArray(&vectExtrema2048, 2048);
+    emit stepsOfPrecalculation(6);
     vectExtrema4096.clear();
     prepareExtremaArray(&vectExtrema4096, 4096);
+    emit stepsOfPrecalculation(7);
     vectExtrema8192.clear();
     prepareExtremaArray(&vectExtrema8192, 8192);
+    emit stepsOfPrecalculation(8);
     vectExtrema16384.clear();
     prepareExtremaArray(&vectExtrema16384, 16384);
+    emit stepsOfPrecalculation(9);
 }
 
  void RenderArea::paintEvent(QPaintEvent *event)

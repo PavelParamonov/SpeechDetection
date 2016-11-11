@@ -71,6 +71,10 @@ MainWindow::MainWindow(QWidget *parent) :
     sBarPlotScroller->setMinimum(0);
     sBarPlotScroller->setMaximum(0);
 
+    // Progress bar construction:
+    prBarOpenWavProgress = new QProgressBar();
+    prBarOpenWavProgress->setOrientation(Qt::Horizontal);
+
     hBoxLayMarkerPosition = new QHBoxLayout();
     hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
     hBoxLayMarkerPosition ->addWidget(edMarkerPosition);
@@ -105,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
     vBoxLayRenderControl->addLayout(hBoxLayMarkerPosition);
     vBoxLayRenderControl->addLayout(hBoxLayControlButtons);
     vBoxLayRenderControl->addLayout(hBoxLayWavFileLabel);
+    vBoxLayRenderControl->addWidget(prBarOpenWavProgress);
 
     hBoxLayMain = new QHBoxLayout();
     hBoxLayMain->addLayout(vBoxLayRenderControl);
@@ -126,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
     connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
     connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
+    connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
 }
 
 void MainWindow::sBarPlotScrollerValueChanged(int value)
@@ -134,6 +140,11 @@ void MainWindow::sBarPlotScrollerValueChanged(int value)
     int rightVisibleBorder = value + visibleSamplesCnt - 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
     graphArea->updatePlot();
+}
+
+void MainWindow::prBarOpenWavProgressValueChanged(int value)
+{
+    prBarOpenWavProgress->setValue(value);
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -389,8 +400,10 @@ void MainWindow::pBtnLoadWavClicked()
                 }
             }
             wavFile.close();
-
             visibleSamplesCnt = vectSamples.length();
+            prBarOpenWavProgress->setMinimum(0);
+            prBarOpenWavProgress->setMaximum(8);
+            prBarOpenWavProgress->setValue(0);
             graphArea->setVisibleBorders(0, vectSamples.length()-1);
             //-------
             // We prepare arrays of signal extrema for fast drawing:

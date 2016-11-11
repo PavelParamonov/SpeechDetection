@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QScrollBar>
 #include <QVector>
+#include <QProgressBar>
 
 class RenderArea;
 
@@ -52,6 +53,7 @@ public slots:
     void edMarkerPositionTextEdited(const QString &newText);
     void graphAreaMarkerPositionChanged(int newPosition);
     void sBarPlotScrollerValueChanged(int value);
+    void prBarOpenWavProgressValueChanged(int value);
 
 private:
     // GIU members:
@@ -69,6 +71,7 @@ private:
     int markerPosition;
     int visibleSamplesCnt;
     wavHeader wavFileHeader;
+    QProgressBar *prBarOpenWavProgress;
 };
 
 #endif // MAINWINDOW_H
