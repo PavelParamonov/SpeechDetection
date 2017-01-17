@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QDir>
 
+#include <QList>
 #include <QThread>
 
 #include <iostream>
@@ -356,6 +357,10 @@ void MainWindow::pBtnLoadWavClicked()
 //    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
 //    For Linux:
 //    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
+    QList<QPushButton *> allPButtons = this->findChildren<QPushButton *>();
+    foreach (QPushButton *childButton, allPButtons) {
+        childButton->setEnabled(false);
+    }
     QString wavFileName = QFileDialog::getOpenFileName(this, "Save Marks", QDir::currentPath(), "*.wav");
     WorkerWavFileReader *worker = new WorkerWavFileReader(&wavFileHeader, &vectSamples, wavFileName);
     QThread *new_thread = new QThread;
