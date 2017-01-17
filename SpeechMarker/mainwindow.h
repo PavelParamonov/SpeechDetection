@@ -54,6 +54,8 @@ public slots:
     void graphAreaMarkerPositionChanged(int newPosition);
     void sBarPlotScrollerValueChanged(int value);
     void prBarOpenWavProgressValueChanged(int value);
+    void visualizeNewWavFile();
+    void setNewCurrentWavFileName(QString wavFileName);
 
 private:
     // GIU members:
@@ -72,6 +74,8 @@ private:
     int visibleSamplesCnt;
     wavHeader wavFileHeader;
     QProgressBar *prBarOpenWavProgress;
+    // Private functions:
+
 };
 
 #endif // MAINWINDOW_H

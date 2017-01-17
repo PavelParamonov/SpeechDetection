@@ -1,11 +1,14 @@
 #include "mainwindow.h"
 #include "renderarea.h"
+#include "workerwavfilereader.h"
 #include <QFile>
 #include <QTextStream>
 #include <QtMath>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDir>
+
+#include <QThread>
 
 #include <iostream>
 
@@ -354,107 +357,78 @@ void MainWindow::pBtnLoadWavClicked()
 //    For Linux:
 //    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
     QString wavFileName = QFileDialog::getOpenFileName(this, "Save Marks", QDir::currentPath(), "*.wav");
-    if(!wavFileName.isEmpty()) {
-        QFile wavFile(wavFileName);
-        if (!wavFile.exists()) {
-            edCurrentWavFile->setText("File doesn't exist");
-        }
-        else {
-            wavFile.open(QIODevice::ReadOnly);
-            QDataStream inFile(&wavFile);
-            int bytesRead=0;
-            bytesRead += inFile.readRawData(wavFileHeader.chunkID, 4);
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.chunkSize), sizeof(wavFileHeader.chunkSize));
-            bytesRead += inFile.readRawData(wavFileHeader.format, 4);
-            bytesRead += inFile.readRawData(wavFileHeader.subchunk1ID, 4);
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk1Size), sizeof(wavFileHeader.subchunk1Size));
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.audioFormat), sizeof(wavFileHeader.audioFormat));
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.numChannels), sizeof(wavFileHeader.numChannels));
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.sampleRate), sizeof(wavFileHeader.sampleRate));
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.byteRate), sizeof(wavFileHeader.byteRate));
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.blockAlign), sizeof(wavFileHeader.blockAlign));
-            bytesRead += inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.bitsPerSample), sizeof(wavFileHeader.bitsPerSample));
-            inFile.skipRawData(wavFileHeader.subchunk1Size +
-                               sizeof(wavFileHeader.chunkID) +
-                               sizeof(wavFileHeader.chunkSize) +
-                               sizeof(wavFileHeader.format) +
-                               sizeof(wavFileHeader.subchunk1ID) +
-                               sizeof(wavFileHeader.subchunk1Size) -
-                               bytesRead);
-            inFile.readRawData(wavFileHeader.subchunk2ID, 4);
-            inFile.readRawData(reinterpret_cast<char *>(&wavFileHeader.subchunk2Size), sizeof(wavFileHeader.subchunk2Size));
-            vectSamples.clear();
-            vectSamples.resize(wavFileHeader.subchunk2Size/(wavFileHeader.bitsPerSample/8));
-            for(int i=0; i<vectSamples.length();i++) {
-                switch (wavFileHeader.bitsPerSample/8) {
-                case 1:
-                    unsigned char charBuffer;
-                    inFile.readRawData(reinterpret_cast<char *>(&charBuffer), sizeof(charBuffer));
-                    vectSamples.data()[i] = static_cast<int>(charBuffer);
-                    break;
-                case 2:
-                    signed short shortBuffer;
-                    inFile.readRawData(reinterpret_cast<char *>(&shortBuffer), sizeof(shortBuffer));
-                    vectSamples.data()[i] = static_cast<int>(shortBuffer);
-                    break;
-                }
-            }
-            wavFile.close();
-            visibleSamplesCnt = vectSamples.length();
-            prBarOpenWavProgress->setMinimum(0);
-            prBarOpenWavProgress->setMaximum(8);
-            prBarOpenWavProgress->setValue(0);
-            graphArea->setVisibleBorders(0, vectSamples.length()-1);
-            //-------
-            // We prepare arrays of signal extrema for fast drawing:
-            graphArea->preparePrecalculatedArrays();
-            //-------
-            graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
-            // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
-            edMarkerPosition->blockSignals(true);
-            cBxIntervals->blockSignals(true);
-            // Type wav file information:
-            edCurrentWavFile->setText(wavFileName);
-            edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
-            edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
-            edSamplesInWav->setText(QString::number(vectSamples.length()));
-            // Add default label that covers the whole wav:
-            vectLabels.clear();
-            vectLabels.append(defaultLabel);
-            // Clear all previously set marks:
-            vectMarks.clear();
-            // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
-            vectMarks.append(0);
-            vectMarks.append(vectSamples.length()-1);
-            cBxIntervals->clear();
-            // When wav file is opened we have one interval from begining to the end:
-            cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
-            // Initial marker position:
-            markerPosition = 0;
-            edMarkerPosition->setText(QString::number(markerPosition));
-            // Unlock all necessary GUI elements:
-            edMarkerPosition->setEnabled(true);
-            edSamplesInWav->setEnabled(true);
-            pBtnLoadMarkers->setEnabled(true);
-            pBtnSaveMarkers->setEnabled(true);
-            edCurrentWavFile->setEnabled(true);
-            edWavFileSamplRate->setEnabled(true);
-            edWavFileBitsPerSample->setEnabled(true);
-            pBtnZoomIn->setEnabled(true);
-            pBtnZoomOut->setEnabled(true);
-            cBxIntervals->setEnabled(true);
-            cBxMarkType->setEnabled(true);
-            cBxWindowSize->setEnabled(true);
-            pBtnPlaceMark->setEnabled(true);
-            sBarPlotScroller->setMinimum(0);
-            sBarPlotScroller->setMaximum(0);
-            // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
-            edMarkerPosition->blockSignals(false);
-            cBxIntervals->blockSignals(false);
-            graphArea->setEnabled(true);
-            graphArea->updatePlot();
-        }
-    }
+    WorkerWavFileReader *worker = new WorkerWavFileReader(&wavFileHeader, &vectSamples, wavFileName);
+    QThread *new_thread = new QThread;
+    worker->moveToThread(new_thread);
+    connect(new_thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(finished()), new_thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(new_thread, SIGNAL(finished()), new_thread, SLOT(deleteLater()));
+    connect(worker, SIGNAL(finished()), this, SLOT(visualizeNewWavFile()));
+    connect(worker, SIGNAL(updateCurrentWavFileName(QString)), this, SLOT(setNewCurrentWavFileName(QString)));
+    new_thread->start();
+}
+
+void MainWindow::visualizeNewWavFile()
+{
+    visibleSamplesCnt = vectSamples.length();
+    prBarOpenWavProgress->setMinimum(0);
+    prBarOpenWavProgress->setMaximum(8);
+    prBarOpenWavProgress->setValue(0);
+    graphArea->setVisibleBorders(0, vectSamples.length()-1);
+    //-------
+    // We prepare arrays of signal extrema for fast drawing:
+    graphArea->preparePrecalculatedArrays();
+    //-------
+    graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
+    // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
+    edMarkerPosition->blockSignals(true);
+    cBxIntervals->blockSignals(true);
+
+    edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
+    edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
+    edSamplesInWav->setText(QString::number(vectSamples.length()));
+    // Add default label that covers the whole wav:
+    vectLabels.clear();
+    vectLabels.append(defaultLabel);
+    // Clear all previously set marks:
+    vectMarks.clear();
+    // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
+    vectMarks.append(0);
+    vectMarks.append(vectSamples.length()-1);
+    cBxIntervals->clear();
+    // When wav file is opened we have one interval from begining to the end:
+    cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
+    // Initial marker position:
+    markerPosition = 0;
+    edMarkerPosition->setText(QString::number(markerPosition));
+    // Unlock all necessary GUI elements:
+    edMarkerPosition->setEnabled(true);
+    edSamplesInWav->setEnabled(true);
+    pBtnLoadMarkers->setEnabled(true);
+    pBtnSaveMarkers->setEnabled(true);
+    edCurrentWavFile->setEnabled(true);
+    edWavFileSamplRate->setEnabled(true);
+    edWavFileBitsPerSample->setEnabled(true);
+    pBtnZoomIn->setEnabled(true);
+    pBtnZoomOut->setEnabled(true);
+    cBxIntervals->setEnabled(true);
+    cBxMarkType->setEnabled(true);
+    cBxWindowSize->setEnabled(true);
+    pBtnPlaceMark->setEnabled(true);
+    sBarPlotScroller->setMinimum(0);
+    sBarPlotScroller->setMaximum(0);
+    // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
+    edMarkerPosition->blockSignals(false);
+    cBxIntervals->blockSignals(false);
+    graphArea->setEnabled(true);
+    graphArea->updatePlot();
+}
+
+void MainWindow::setNewCurrentWavFileName(QString wavFileName)
+{
+    // Type wav file information:
+     edCurrentWavFile->setText(wavFileName);
 }
 
 MainWindow::~MainWindow()
