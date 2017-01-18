@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "renderarea.h"
-#include "workerwavfilereader.h"
 #include <QFile>
 #include <QTextStream>
 #include <QtMath>
@@ -11,13 +10,14 @@
 #include <QList>
 #include <QThread>
 
+
 #include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
 {
     visibleSamplesCnt = 0;
-
+    previousEnabledState = 0;
     markerPosition = 0;
     graphArea = new RenderArea(&vectSamples, &vectMarks, &markerPosition);
     graphArea->setEnabled(false);
@@ -136,6 +136,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
     connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
     connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
+
+    qRegisterMetaType<wavReaderErrCode>();
 }
 
 void MainWindow::sBarPlotScrollerValueChanged(int value)
@@ -357,10 +359,16 @@ void MainWindow::pBtnLoadWavClicked()
 //    QString wavFileName("D:\\My_Documents\\Pasha_Docs\\GitHub\\SpeechDetection\\SpeechMarker\\example.wav");
 //    For Linux:
 //    QString wavFileName("/home/pavel/dev/SpeechDetection/SpeechMarker/example.wav");
-    QList<QPushButton *> allPButtons = this->findChildren<QPushButton *>();
-    foreach (QPushButton *childButton, allPButtons) {
-        childButton->setEnabled(false);
+    // --- Disable all widgets:
+    QList<QWidget *> allWidgets = this->findChildren<QWidget *>();
+    if(previousEnabledState!=0)
+        delete []previousEnabledState;
+    previousEnabledState = new bool[allWidgets.size()];
+    for (int i=0; i<allWidgets.size(); i++) {
+        previousEnabledState[i] = allWidgets[i]->isEnabled();
+        allWidgets[i]->setEnabled(false);
     }
+    // ---
     QString wavFileName = QFileDialog::getOpenFileName(this, "Save Marks", QDir::currentPath(), "*.wav");
     WorkerWavFileReader *worker = new WorkerWavFileReader(&wavFileHeader, &vectSamples, wavFileName);
     QThread *new_thread = new QThread;
@@ -369,71 +377,79 @@ void MainWindow::pBtnLoadWavClicked()
     connect(worker, SIGNAL(finished()), new_thread, SLOT(quit()));
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(new_thread, SIGNAL(finished()), new_thread, SLOT(deleteLater()));
-    connect(worker, SIGNAL(finished()), this, SLOT(visualizeNewWavFile()));
-    connect(worker, SIGNAL(updateCurrentWavFileName(QString)), this, SLOT(setNewCurrentWavFileName(QString)));
+//    connect(worker, SIGNAL(finished()), this, SLOT(visualizeNewWavFile()));
+    connect(worker, SIGNAL(processResult(wavReaderErrCode, QString)), this, SLOT(processWavReaderResult(wavReaderErrCode, QString)));
     new_thread->start();
 }
 
-void MainWindow::visualizeNewWavFile()
+void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFileName)
 {
-    visibleSamplesCnt = vectSamples.length();
-    prBarOpenWavProgress->setMinimum(0);
-    prBarOpenWavProgress->setMaximum(8);
-    prBarOpenWavProgress->setValue(0);
-    graphArea->setVisibleBorders(0, vectSamples.length()-1);
-    //-------
-    // We prepare arrays of signal extrema for fast drawing:
-    graphArea->preparePrecalculatedArrays();
-    //-------
-    graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
-    // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
-    edMarkerPosition->blockSignals(true);
-    cBxIntervals->blockSignals(true);
+    QList<QWidget *> allWidgets = this->findChildren<QWidget *>();
+    switch (errCode) {
+    case FILENOTEXIST:
+        // Restore previuos enable state for every widget:
+        for (int i=0; i<allWidgets.size(); i++) {
+            allWidgets[i]->setEnabled(previousEnabledState[i]);
+        }
+        break;
+    case WAVEMPTY:
+        // Restore previuos enable state for every widget:
+        for (int i=0; i<allWidgets.size(); i++) {
+            allWidgets[i]->setEnabled(previousEnabledState[i]);
+        }
+        break;
+    case READSUCC:
+        visibleSamplesCnt = vectSamples.length();
+        prBarOpenWavProgress->setMinimum(0);
+        prBarOpenWavProgress->setMaximum(8);
+        prBarOpenWavProgress->setValue(0);
+        graphArea->setVisibleBorders(0, vectSamples.length()-1);
+        //-------
+        // We prepare arrays of signal extrema for fast drawing:
+        graphArea->preparePrecalculatedArrays();
+        //-------
+        graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
+        // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
+        edMarkerPosition->blockSignals(true);
+        cBxIntervals->blockSignals(true);
 
-    edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
-    edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
-    edSamplesInWav->setText(QString::number(vectSamples.length()));
-    // Add default label that covers the whole wav:
-    vectLabels.clear();
-    vectLabels.append(defaultLabel);
-    // Clear all previously set marks:
-    vectMarks.clear();
-    // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
-    vectMarks.append(0);
-    vectMarks.append(vectSamples.length()-1);
-    cBxIntervals->clear();
-    // When wav file is opened we have one interval from begining to the end:
-    cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
-    // Initial marker position:
-    markerPosition = 0;
-    edMarkerPosition->setText(QString::number(markerPosition));
-    // Unlock all necessary GUI elements:
-    edMarkerPosition->setEnabled(true);
-    edSamplesInWav->setEnabled(true);
-    pBtnLoadMarkers->setEnabled(true);
-    pBtnSaveMarkers->setEnabled(true);
-    edCurrentWavFile->setEnabled(true);
-    edWavFileSamplRate->setEnabled(true);
-    edWavFileBitsPerSample->setEnabled(true);
-    pBtnZoomIn->setEnabled(true);
-    pBtnZoomOut->setEnabled(true);
-    cBxIntervals->setEnabled(true);
-    cBxMarkType->setEnabled(true);
-    cBxWindowSize->setEnabled(true);
-    pBtnPlaceMark->setEnabled(true);
-    sBarPlotScroller->setMinimum(0);
-    sBarPlotScroller->setMaximum(0);
-    // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
-    edMarkerPosition->blockSignals(false);
-    cBxIntervals->blockSignals(false);
-    graphArea->setEnabled(true);
-    graphArea->updatePlot();
-}
+        edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
+        edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
+        edSamplesInWav->setText(QString::number(vectSamples.length()));
+        // Add default label that covers the whole wav:
+        vectLabels.clear();
+        vectLabels.append(defaultLabel);
+        // Clear all previously set marks:
+        vectMarks.clear();
+        // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
+        vectMarks.append(0);
+        vectMarks.append(vectSamples.length()-1);
+        cBxIntervals->clear();
+        // When wav file is opened we have one interval from begining to the end:
+        cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
+        // Initial marker position:
+        markerPosition = 0;
+        edMarkerPosition->setText(QString::number(markerPosition));
+        // Unlock all GUI elements:
+        foreach (QWidget *childWidget, allWidgets) {
+            childWidget->setEnabled(true);
+        }
+        // Disable "Remove Mark" button because there are no marks yet:
+        pBtnRemoveMark->setEnabled(false);
 
-void MainWindow::setNewCurrentWavFileName(QString wavFileName)
-{
-    // Type wav file information:
-     edCurrentWavFile->setText(wavFileName);
+        sBarPlotScroller->setMinimum(0);
+        sBarPlotScroller->setMaximum(0);
+        // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
+        edMarkerPosition->blockSignals(false);
+        cBxIntervals->blockSignals(false);
+        graphArea->setEnabled(true);
+        graphArea->updatePlot();
+        // Type wav file information:
+         edCurrentWavFile->setText(wavFileName);
+        break;
+    default:
+        break;
+    }
 }
 
 MainWindow::~MainWindow()

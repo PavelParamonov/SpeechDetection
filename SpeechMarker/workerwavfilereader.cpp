@@ -1,4 +1,6 @@
 #include "workerwavfilereader.h"
+#include <QFile>
+#include <QDataStream>
 
 WorkerWavFileReader::WorkerWavFileReader(wavHeader *headerPtr, QVector<int> *vectSamplesPtr, QString &inputFileName, QObject *parent) : QObject(parent)
 {
@@ -10,7 +12,7 @@ void WorkerWavFileReader::process()
     if(!wavFileName.isEmpty()) {
         QFile wavFile(wavFileName);
         if (!wavFile.exists()) {
-            emit updateCurrentWavFileName(QString("File doesn't exist"));
+            emit processResult(FILENOTEXIST, QString("File doesn't exist"));
         }
         else {
             wavFile.open(QIODevice::ReadOnly);
@@ -53,8 +55,10 @@ void WorkerWavFileReader::process()
                 }
             }
             wavFile.close();
-            emit updateCurrentWavFileName(wavFileName);
+            emit processResult(READSUCC, wavFileName);
         }
     }
+    else
+        emit processResult(WAVEMPTY, QString("Wav file is empty"));
     emit finished();
 }

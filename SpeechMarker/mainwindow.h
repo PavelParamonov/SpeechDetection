@@ -12,26 +12,13 @@
 #include <QVector>
 #include <QProgressBar>
 
+#include "workerwavfilereader.h"
+
 class RenderArea;
 
 #define defaultLabel "??"
 #define zoomCoeff 1.5
 
-struct wavHeader {
-    char chunkID[4];
-    quint32 chunkSize;
-    char format[4];
-    char subchunk1ID[4];
-    quint32 subchunk1Size;
-    quint16 audioFormat;
-    quint16 numChannels;
-    quint32 sampleRate;
-    quint32 byteRate;
-    quint16 blockAlign;
-    quint16 bitsPerSample;
-    char subchunk2ID[4];
-    quint32 subchunk2Size;
-};
 
 class MainWindow : public QWidget
 {
@@ -54,8 +41,8 @@ public slots:
     void graphAreaMarkerPositionChanged(int newPosition);
     void sBarPlotScrollerValueChanged(int value);
     void prBarOpenWavProgressValueChanged(int value);
-    void visualizeNewWavFile();
-    void setNewCurrentWavFileName(QString wavFileName);
+//    void visualizeNewWavFile();
+    void processWavReaderResult(wavReaderErrCode errCode, QString wavFileName);
 
 private:
     // GIU members:
@@ -74,8 +61,8 @@ private:
     int visibleSamplesCnt;
     wavHeader wavFileHeader;
     QProgressBar *prBarOpenWavProgress;
+    bool *previousEnabledState;
     // Private functions:
-
 };
 
 #endif // MAINWINDOW_H
