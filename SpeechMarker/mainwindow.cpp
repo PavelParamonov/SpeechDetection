@@ -370,6 +370,8 @@ void MainWindow::pBtnLoadWavClicked()
     }
     // ---
     QString wavFileName = QFileDialog::getOpenFileName(this, "Save Marks", QDir::currentPath(), "*.wav");
+    graphArea->setState(INACTIVE, "Reading wav file...");
+    graphArea->updatePlot();
     WorkerWavFileReader *worker = new WorkerWavFileReader(&wavFileHeader, &vectSamples, wavFileName);
     QThread *new_thread = new QThread;
     worker->moveToThread(new_thread);
@@ -377,7 +379,6 @@ void MainWindow::pBtnLoadWavClicked()
     connect(worker, SIGNAL(finished()), new_thread, SLOT(quit()));
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(new_thread, SIGNAL(finished()), new_thread, SLOT(deleteLater()));
-//    connect(worker, SIGNAL(finished()), this, SLOT(visualizeNewWavFile()));
     connect(worker, SIGNAL(processResult(wavReaderErrCode, QString)), this, SLOT(processWavReaderResult(wavReaderErrCode, QString)));
     new_thread->start();
 }
@@ -385,6 +386,7 @@ void MainWindow::pBtnLoadWavClicked()
 void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFileName)
 {
     QList<QWidget *> allWidgets = this->findChildren<QWidget *>();
+    graphArea->setState(ACTIVEDRAWING);
     switch (errCode) {
     case FILENOTEXIST:
         // Restore previuos enable state for every widget:
@@ -443,13 +445,13 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         edMarkerPosition->blockSignals(false);
         cBxIntervals->blockSignals(false);
         graphArea->setEnabled(true);
-        graphArea->updatePlot();
         // Type wav file information:
          edCurrentWavFile->setText(wavFileName);
         break;
     default:
         break;
     }
+    graphArea->updatePlot();
 }
 
 MainWindow::~MainWindow()

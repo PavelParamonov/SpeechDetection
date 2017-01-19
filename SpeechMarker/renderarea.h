@@ -6,6 +6,9 @@
 #include <QVector>
 #include <QMouseEvent>
 #include <QPair>
+#include <QString>
+
+enum RenderAreaState {ACTIVEDRAWING, INACTIVE};
 
 class RenderArea : public QWidget
 {
@@ -20,8 +23,8 @@ public:
     void setSelectedInterval(int ind) {selectedInterval=ind;}
     void setVisibleBorders(int left, int right) {leftVisibleBorder = left; rightVisibleBorder = right;}
     void updatePlot();
-    // Prepare pre-calsulated extrema arrays for drawing:
-    void preparePrecalculatedArrays();
+    void preparePrecalculatedArrays();  // Prepare pre-calsulated extrema arrays for drawing
+    void setState(RenderAreaState newState, QString newMessage=QString("")) {state = newState; inactiveMessage = newMessage;}
 signals:
     void markerPositionChanged(int newPosition);
     void stepsOfPrecalculation(int stepVal);
@@ -47,6 +50,8 @@ private:
     double xScaleSamples, yScaleSamples;
     int selectedInterval;
     int leftVisibleBorder, rightVisibleBorder;
+    RenderAreaState state;
+    QString inactiveMessage;
     // Drawing functions:
     void drawBackground(QPainter &painter);
     void drawMarker(QPainter &painter);
@@ -54,6 +59,7 @@ private:
     void drawSamples(QPainter &painter);
     void drawMarks(QPainter &painter);
     void prepareExtremaArray(QVector< QPair<int, int> > *vectExtrema, int samplesPerPixel);
+    void drawMessage(QPainter &painter, QString &message);
 };
 
 #endif // RENDERAREA_H

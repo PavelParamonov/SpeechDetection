@@ -19,6 +19,7 @@ RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers,
     pointUpperMarkerEnd = new QPoint(0,0);
     pointLowerMarkerEnd = new QPoint(0,this->height());
     maxSampleValue = 1;
+    state = ACTIVEDRAWING;
 }
 
 RenderArea::~RenderArea()
@@ -147,37 +148,41 @@ void RenderArea::drawSamples(QPainter &painter)
     }
 }
 
+void RenderArea::drawMessage(QPainter &painter, QString &message)
+{
+    painter.setFont(QFont(QString("Times New Roman"), 14));
+    painter.drawText(QPoint(10, 24), message);
+}
+
 void RenderArea::resizeEvent(QResizeEvent *event)
 {
     Area->setRect(0,0,this->width(), this->height());
-    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
-//    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
-    xScaleSamples = static_cast<double>(rightVisibleBorder - leftVisibleBorder+1)/static_cast<double>(this->width());
-    delete pixmap;
-    pixmap = new QPixmap(Area->width(), Area->height());
-    QPainter painter(pixmap);
-    drawBackground(painter);
-    drawBackground(painter);
-    drawAxis(painter);
-    drawSamples(painter);
-    drawMarks(painter);
-    drawMarker(painter);
+    updatePlot();
 }
 
 void RenderArea::updatePlot()
 {
-    yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
-//    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
-    xScaleSamples = static_cast<double>(rightVisibleBorder - leftVisibleBorder+1)/static_cast<double>(this->width());
     delete pixmap;
     pixmap = new QPixmap(Area->width(), Area->height());
     QPainter painter(pixmap);
-    drawBackground(painter);
-    drawAxis(painter);    
-    drawSamples(painter);
-    drawMarks(painter);
-    drawMarker(painter);
-    this->update();
+    switch(state) {
+    case ACTIVEDRAWING:
+        yScaleSamples = static_cast<double>(this->height())/static_cast<double>(maxSampleValue);
+        //    xScaleSamples = static_cast<double>(vectSamples->length())/static_cast<double>(this->width());
+        xScaleSamples = static_cast<double>(rightVisibleBorder - leftVisibleBorder+1)/static_cast<double>(this->width());
+        drawBackground(painter);
+        drawBackground(painter);
+        drawAxis(painter);
+        drawSamples(painter);
+        drawMarks(painter);
+        drawMarker(painter);
+        break;
+    case INACTIVE:
+        drawMessage(painter, QString(inactiveMessage));
+        break;
+    default:
+        drawMessage(painter, QString("render area is in unknown state"));
+    }
 }
 
 void RenderArea::prepareExtremaArray(QVector<QPair<int, int> > *vectExtrema, int samplesPerPixel)
