@@ -150,8 +150,9 @@ void RenderArea::drawSamples(QPainter &painter)
 
 void RenderArea::drawMessage(QPainter &painter, QString &message)
 {
-    painter.setFont(QFont(QString("Times New Roman"), 14));
-    painter.drawText(QPoint(10, 24), message);
+    int fontSize = 14;
+    painter.setFont(QFont(QString("Times New Roman"), fontSize));
+    painter.drawText(QPoint(this->width()/2 - message.length()/2*(fontSize/2), this->height()/2 + (fontSize/2)), message);
 }
 
 void RenderArea::resizeEvent(QResizeEvent *event)
