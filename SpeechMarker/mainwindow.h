@@ -41,7 +41,7 @@ public slots:
     void graphAreaMarkerPositionChanged(int newPosition);
     void sBarPlotScrollerValueChanged(int value);
     void prBarOpenWavProgressValueChanged(int value);
-//    void visualizeNewWavFile();
+    void prBarOpenWavProgressMaxValueChanged(int value);
     void processWavReaderResult(wavReaderErrCode errCode, QString wavFileName);
 
 private:

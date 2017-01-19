@@ -5,6 +5,8 @@
 #include <QString>
 #include <QVector>
 
+#define BYTES_READ_CNT_SIGNAL 32768
+
 enum wavReaderErrCode {READSUCC, WAVEMPTY, FILENOTEXIST};
 
 Q_DECLARE_METATYPE(wavReaderErrCode)
@@ -35,6 +37,8 @@ public slots:
 signals:
     void finished();
     void processResult(wavReaderErrCode errCode, QString);
+    void samplesInWavToRead(int samplesCnt);
+    void bytesAlreadyRead(int bytesCnt);
 private:
     wavHeader *prtWavHeader;
     QVector<int> *ptrVectSamples;

@@ -153,6 +153,13 @@ void MainWindow::prBarOpenWavProgressValueChanged(int value)
     prBarOpenWavProgress->setValue(value);
 }
 
+void MainWindow::prBarOpenWavProgressMaxValueChanged(int value)
+{
+    prBarOpenWavProgress->setMinimum(0);
+    prBarOpenWavProgress->setMaximum(value-1);
+    prBarOpenWavProgress->setValue(0);
+}
+
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
 {
     markerPosition = newPosition;
@@ -380,6 +387,8 @@ void MainWindow::pBtnLoadWavClicked()
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(new_thread, SIGNAL(finished()), new_thread, SLOT(deleteLater()));
     connect(worker, SIGNAL(processResult(wavReaderErrCode, QString)), this, SLOT(processWavReaderResult(wavReaderErrCode, QString)));
+    connect(worker, SIGNAL(bytesAlreadyRead(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
+    connect(worker, SIGNAL(samplesInWavToRead(int)), this, SLOT(prBarOpenWavProgressMaxValueChanged(int)));
     new_thread->start();
 }
 

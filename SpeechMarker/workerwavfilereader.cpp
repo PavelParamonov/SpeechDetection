@@ -40,6 +40,7 @@ void WorkerWavFileReader::process()
             inFile.readRawData(reinterpret_cast<char *>(&prtWavHeader->subchunk2Size), sizeof(prtWavHeader->subchunk2Size));
             ptrVectSamples->clear();
             ptrVectSamples->resize(prtWavHeader->subchunk2Size/(prtWavHeader->bitsPerSample/8));
+            emit samplesInWavToRead(ptrVectSamples->length());
             for(int i=0; i<ptrVectSamples->length();i++) {
                 switch (prtWavHeader->bitsPerSample/8) {
                 case 1:
@@ -53,6 +54,8 @@ void WorkerWavFileReader::process()
                     ptrVectSamples->data()[i] = static_cast<int>(shortBuffer);
                     break;
                 }
+                if((!(i % BYTES_READ_CNT_SIGNAL)) || (i == ptrVectSamples->length()-1))
+                    emit bytesAlreadyRead(i);
             }
             wavFile.close();
             emit processResult(READSUCC, wavFileName);
