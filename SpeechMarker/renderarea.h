@@ -60,6 +60,7 @@ private:
     void drawMarks(QPainter &painter);
     void prepareExtremaArray(QVector< QPair<int, int> > *vectExtrema, int samplesPerPixel);
     void drawMessage(QPainter &painter, QString &message);
+    void redrawPixmap();
 };
 
 #endif // RENDERAREA_H

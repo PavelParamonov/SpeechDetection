@@ -158,10 +158,10 @@ void RenderArea::drawMessage(QPainter &painter, QString &message)
 void RenderArea::resizeEvent(QResizeEvent *event)
 {
     Area->setRect(0,0,this->width(), this->height());
-    updatePlot();
+    redrawPixmap();
 }
 
-void RenderArea::updatePlot()
+void RenderArea::redrawPixmap()
 {
     delete pixmap;
     pixmap = new QPixmap(Area->width(), Area->height());
@@ -184,6 +184,12 @@ void RenderArea::updatePlot()
     default:
         drawMessage(painter, QString("render area is in unknown state"));
     }
+}
+
+void RenderArea::updatePlot()
+{
+    redrawPixmap();
+    this->update();
 }
 
 void RenderArea::prepareExtremaArray(QVector<QPair<int, int> > *vectExtrema, int samplesPerPixel)
