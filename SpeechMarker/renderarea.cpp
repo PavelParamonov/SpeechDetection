@@ -4,6 +4,9 @@
 #include <QVariant>
 #include <algorithm>
 
+#include <QThread>
+#include "workerwavformwrecalculation.h"
+
 RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), selectedInterval(0), QWidget(parent)
 {
     Area = new QRect(0,0,this->width(), this->height());
@@ -19,6 +22,7 @@ RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers,
     pointUpperMarkerEnd = new QPoint(0,0);
     pointLowerMarkerEnd = new QPoint(0,this->height());
     maxSampleValue = 1;
+    arraysReadyCnt = 0;
     state = ACTIVEDRAWING;
 }
 
@@ -194,54 +198,46 @@ void RenderArea::updatePlot()
 
 void RenderArea::prepareExtremaArray(QVector<QPair<int, int> > *vectExtrema, int samplesPerPixel)
 {
-    int vectLen128 = qCeil(vectSamples->length() / static_cast<double>(samplesPerPixel));
-    vectExtrema->resize(vectLen128);
-    for(int i=0; i < vectExtrema->length(); i++) {
-        vectExtrema->data()[i].first = i*samplesPerPixel;     // Index of the 1-st extremum for the i-th window
-        vectExtrema->data()[i].second = i*samplesPerPixel;    // Index of the 2-nd extremum for the i-th window
-        for(int j=i*samplesPerPixel + 1; (j < (i+1)*samplesPerPixel) && (j < vectSamples->length()); j++) {
-            // Find index of a minimal number in the i-th window:
-            if(vectSamples->data()[j] < vectSamples->data()[vectExtrema->data()[i].first])
-                vectExtrema->data()[i].first = j;
-            // Find index of a maximal number in the i-th window:
-            if(vectSamples->data()[j] > vectSamples->data()[vectExtrema->data()[i].second])
-                vectExtrema->data()[i].second = j;
-        }
-        // Correct order for first and second if necessary:
-        if(vectExtrema->data()[i].first > vectExtrema->data()[i].second)
-            std::swap(vectExtrema->data()[i].first, vectExtrema->data()[i].second);
-    }
+    WorkerWavformPrecalculation *worker = new WorkerWavformPrecalculation(vectSamples, vectExtrema, samplesPerPixel, &mutex);
+    QThread *new_thread = new QThread;
+    worker->moveToThread(new_thread);
+    connect(new_thread, SIGNAL(started()), worker, SLOT(process()));
+    connect(worker, SIGNAL(finished()), new_thread, SLOT(quit()));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(new_thread, SIGNAL(finished()), new_thread, SLOT(deleteLater()));
+    connect(worker, SIGNAL(finished()), this, SLOT(gatherPrecalculationResults()));
+    new_thread->start();
 }
 
 void RenderArea::preparePrecalculatedArrays()
 {
+    arraysReadyCnt = 0;
     vectExtrema64.clear();
     prepareExtremaArray(&vectExtrema64, 64);
-    emit stepsOfPrecalculation(1);
     vectExtrema128.clear();
     prepareExtremaArray(&vectExtrema128, 128);
-    emit stepsOfPrecalculation(2);
     vectExtrema256.clear();
     prepareExtremaArray(&vectExtrema256, 256);
-    emit stepsOfPrecalculation(3);
     vectExtrema512.clear();
     prepareExtremaArray(&vectExtrema512, 512);
-    emit stepsOfPrecalculation(4);
     vectExtrema1024.clear();
     prepareExtremaArray(&vectExtrema1024, 1024);
-    emit stepsOfPrecalculation(5);
     vectExtrema2048.clear();
     prepareExtremaArray(&vectExtrema2048, 2048);
-    emit stepsOfPrecalculation(6);
     vectExtrema4096.clear();
     prepareExtremaArray(&vectExtrema4096, 4096);
-    emit stepsOfPrecalculation(7);
     vectExtrema8192.clear();
     prepareExtremaArray(&vectExtrema8192, 8192);
-    emit stepsOfPrecalculation(8);
     vectExtrema16384.clear();
     prepareExtremaArray(&vectExtrema16384, 16384);
-    emit stepsOfPrecalculation(9);
+}
+
+void RenderArea::gatherPrecalculationResults()
+{
+    arraysReadyCnt++;
+    emit stepsOfPrecalculation(arraysReadyCnt);
+    if(arraysReadyCnt == 9)
+        emit precalculatedArraysReady();
 }
 
  void RenderArea::paintEvent(QPaintEvent *event)

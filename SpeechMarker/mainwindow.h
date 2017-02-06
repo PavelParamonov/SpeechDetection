@@ -43,6 +43,7 @@ public slots:
     void prBarOpenWavProgressValueChanged(int value);
     void prBarOpenWavProgressMaxValueChanged(int value);
     void processWavReaderResult(wavReaderErrCode errCode, QString wavFileName);
+    void drawPrecalculatedArray();
 
 private:
     // GIU members:

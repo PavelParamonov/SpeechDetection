@@ -136,6 +136,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
     connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
     connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
+    connect(graphArea, SIGNAL(precalculatedArraysReady()), this, SLOT(drawPrecalculatedArray()));
 
     qRegisterMetaType<wavReaderErrCode>();
 }
@@ -395,19 +396,20 @@ void MainWindow::pBtnLoadWavClicked()
 void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFileName)
 {
     QList<QWidget *> allWidgets = this->findChildren<QWidget *>();
-    graphArea->setState(ACTIVEDRAWING);
     switch (errCode) {
     case FILENOTEXIST:
         // Restore previuos enable state for every widget:
         for (int i=0; i<allWidgets.size(); i++) {
             allWidgets[i]->setEnabled(previousEnabledState[i]);
         }
+        graphArea->setState(ACTIVEDRAWING);
         break;
     case WAVEMPTY:
         // Restore previuos enable state for every widget:
         for (int i=0; i<allWidgets.size(); i++) {
             allWidgets[i]->setEnabled(previousEnabledState[i]);
         }
+        graphArea->setState(ACTIVEDRAWING);
         break;
     case READSUCC:
         visibleSamplesCnt = vectSamples.length();
@@ -415,15 +417,16 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         prBarOpenWavProgress->setMaximum(8);
         prBarOpenWavProgress->setValue(0);
         graphArea->setVisibleBorders(0, vectSamples.length()-1);
+        graphArea->setState(INACTIVE, "Precalculating waveforms for visualization...");
         //-------
         // We prepare arrays of signal extrema for fast drawing:
         graphArea->preparePrecalculatedArrays();
-        //-------
+        // Then MainWidget waits for signal precalculatedArraysReady() from graphArea which is connected to slot drawPrecalculatedArray()
+        //-------------------------------------------------------------------------------------------------------------------------------
         graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
         // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
         edMarkerPosition->blockSignals(true);
         cBxIntervals->blockSignals(true);
-
         edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
         edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
         edSamplesInWav->setText(QString::number(vectSamples.length()));
@@ -441,25 +444,32 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         // Initial marker position:
         markerPosition = 0;
         edMarkerPosition->setText(QString::number(markerPosition));
-        // Unlock all GUI elements:
-        foreach (QWidget *childWidget, allWidgets) {
-            childWidget->setEnabled(true);
-        }
-        // Disable "Remove Mark" button because there are no marks yet:
-        pBtnRemoveMark->setEnabled(false);
-
-        sBarPlotScroller->setMinimum(0);
-        sBarPlotScroller->setMaximum(0);
-        // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
-        edMarkerPosition->blockSignals(false);
-        cBxIntervals->blockSignals(false);
-        graphArea->setEnabled(true);
         // Type wav file information:
-         edCurrentWavFile->setText(wavFileName);
+        edCurrentWavFile->setText(wavFileName);
         break;
     default:
         break;
     }
+    graphArea->updatePlot();
+}
+
+void MainWindow::drawPrecalculatedArray()
+{
+    // Unlock all GUI elements:
+    QList<QWidget *> allWidgets = this->findChildren<QWidget *>();
+    foreach (QWidget *childWidget, allWidgets) {
+        childWidget->setEnabled(true);
+    }
+    // Disable "Remove Mark" button because there are no marks yet:
+    pBtnRemoveMark->setEnabled(false);
+    // ---
+    sBarPlotScroller->setMinimum(0);
+    sBarPlotScroller->setMaximum(0);
+    // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
+    edMarkerPosition->blockSignals(false);
+    cBxIntervals->blockSignals(false);
+    graphArea->setEnabled(true);
+    graphArea->setState(ACTIVEDRAWING);
     graphArea->updatePlot();
 }
 

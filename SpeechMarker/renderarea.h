@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QPair>
 #include <QString>
+#include <QMutex>
 
 enum RenderAreaState {ACTIVEDRAWING, INACTIVE};
 
@@ -28,7 +29,9 @@ public:
 signals:
     void markerPositionChanged(int newPosition);
     void stepsOfPrecalculation(int stepVal);
+    void precalculatedArraysReady();
 public slots:
+    void gatherPrecalculationResults();
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
@@ -42,6 +45,8 @@ private:
     QPoint *pointLeftAxisEnd, *pointRightAxisEnd, *pointUpperMarkerEnd, *pointLowerMarkerEnd;
     unsigned int maxSampleValue;
     const int *markerPos;
+    int arraysReadyCnt;
+    QMutex mutex;
     // -----------------------------------------
     const QVector<int> *vectSamples, *vectMarks;
     // -----------------------------------------
