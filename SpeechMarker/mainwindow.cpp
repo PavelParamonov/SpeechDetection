@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     visibleSamplesCnt = 0;
     previousEnabledState = 0;
     markerPosition = 0;
-    graphArea = new RenderArea(&vectSamples, &vectMarks, &markerPosition);
+    graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
     graphArea->setEnabled(false);
     pBtnLoadWav = new QPushButton("Load Wav File");
     pBtnSaveMarkers = new QPushButton("Save markers");

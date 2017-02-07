@@ -7,7 +7,7 @@
 #include <QThread>
 #include "workerwavformwrecalculation.h"
 
-RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), markerPos(PtrMarkerPos), selectedInterval(0), QWidget(parent)
+RenderArea::RenderArea(const QVector<int> *samples, const QVector<int> *markers, const QVector<QString> *labels, const int *PtrMarkerPos, QWidget *parent) : vectSamples(samples), vectMarks(markers), vectLabels(labels), markerPos(PtrMarkerPos), selectedInterval(0), QWidget(parent)
 {
     Area = new QRect(0,0,this->width(), this->height());
     pixmap = new QPixmap(Area->width(), Area->height());
@@ -75,12 +75,29 @@ void RenderArea::drawMarker(QPainter &painter)
 void RenderArea::drawMarks(QPainter &painter)
 {
     painter.setPen(*pnMarks);
-    for(int i=0; i<vectMarks->length(); i++) {
+    for(int i=0; i<vectMarks->length()-1; i++) {
         if((vectMarks->data()[i] >= leftVisibleBorder) && (vectMarks->data()[i] <= rightVisibleBorder)) {
             QPoint upperPoint(qFloor(static_cast<double>(vectMarks->data()[i]- leftVisibleBorder)/xScaleSamples), 0);
             QPoint lowerPoint(qFloor(static_cast<double>(vectMarks->data()[i]- leftVisibleBorder)/xScaleSamples),this->height());
             painter.drawLine(upperPoint, lowerPoint);
         }
+        bool xleftVisible = ((vectMarks->data()[i] >= leftVisibleBorder) && (vectMarks->data()[i] <= rightVisibleBorder));
+        bool xrightVisible = ((vectMarks->data()[i+1] >= leftVisibleBorder) && (vectMarks->data()[i+1] <= rightVisibleBorder));
+        if((vectMarks->data()[i]<=rightVisibleBorder) && (vectMarks->data()[i+1]>=leftVisibleBorder)){
+            // if interval between left and right marks is visible then we draw the label:
+            int fontSize = 12;
+            painter.setFont(QFont(QString("Times New Roman"), fontSize));
+            int xleft = xleftVisible? qFloor(static_cast<double>(vectMarks->data()[i]- leftVisibleBorder)/xScaleSamples) : 0;
+            int xright = xrightVisible? qFloor(static_cast<double>(vectMarks->data()[i+1]- leftVisibleBorder)/xScaleSamples) : this->width();
+            QPoint textCoord(xleft + (xright-xleft)/2 - vectLabels->data()[i].length()/2*(fontSize/2), this->height()/2 + 3*this->height()/8);
+            painter.drawText(textCoord, vectLabels->data()[i]);
+        }
+    }
+    int lastMarkInd = vectMarks->length()-1;
+    if((vectMarks->data()[lastMarkInd] >= leftVisibleBorder) && (vectMarks->data()[lastMarkInd] <= rightVisibleBorder)) {
+        QPoint upperPoint(qFloor(static_cast<double>(vectMarks->data()[lastMarkInd]- leftVisibleBorder)/xScaleSamples), 0);
+        QPoint lowerPoint(qFloor(static_cast<double>(vectMarks->data()[lastMarkInd]- leftVisibleBorder)/xScaleSamples),this->height());
+        painter.drawLine(upperPoint, lowerPoint);
     }
 }
 

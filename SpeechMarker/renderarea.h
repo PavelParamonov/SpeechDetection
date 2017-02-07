@@ -15,7 +15,7 @@ class RenderArea : public QWidget
 {
     Q_OBJECT
 public:
-    explicit RenderArea(const QVector<int> *samples, const QVector<int> *markers, const int *PtrMarkerPos, QWidget *parent = 0);
+    explicit RenderArea(const QVector<int> *samples, const QVector<int> *markers, const QVector<QString> *labels, const int *PtrMarkerPos, QWidget *parent = 0);
     ~RenderArea();
 
     QSize minimumSizeHint() const;
@@ -49,6 +49,7 @@ private:
     QMutex mutex;
     // -----------------------------------------
     const QVector<int> *vectSamples, *vectMarks;
+    const QVector<QString> *vectLabels;
     // -----------------------------------------
     QVector< QPair<int, int> > vectExtrema64, vectExtrema128, vectExtrema256, vectExtrema512, vectExtrema1024, vectExtrema2048, vectExtrema4096, vectExtrema8192, vectExtrema16384;
     // -----------------------------------------
