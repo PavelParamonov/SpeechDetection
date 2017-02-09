@@ -303,10 +303,12 @@ void MainWindow::pBtnLoadMarkersClicked()
                 // Unblock signals emission and force update of graphArea:
                 cBxIntervals->blockSignals(false);
                 edMarkerPosition->blockSignals(false);
+                // --
+                graphArea->setSelectedInterval(0);
                 graphArea->updatePlot();
-                labelsFile.close();
                 if(vectMarks.length() > 2)
                     pBtnRemoveMark->setEnabled(true);
+                labelsFile.close();
             }
             else {
                 QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + " for reading.");
