@@ -305,6 +305,8 @@ void MainWindow::pBtnLoadMarkersClicked()
                 edMarkerPosition->blockSignals(false);
                 graphArea->updatePlot();
                 labelsFile.close();
+                if(vectMarks.length() > 2)
+                    pBtnRemoveMark->setEnabled(true);
             }
             else {
                 QMessageBox::critical(this, "SpeechMarker error", "Could not open labels file " + labelsFileName + " for reading.");
