@@ -227,6 +227,7 @@ void MainWindow::cBxMarkTypeCurrentIndexChanged(const QString & text)
 {
     int currInterval = cBxIntervals->currentIndex();
     vectLabels[currInterval] = text;
+    graphArea->updatePlot();
 }
 
 void MainWindow::cBxIntervalsCurrentIndexChanged(int index)
