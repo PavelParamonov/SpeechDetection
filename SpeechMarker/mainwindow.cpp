@@ -202,6 +202,7 @@ void MainWindow::pBtnPlaceMarkClicked()
         cBxIntervals->removeItem(i-1);
         cBxIntervals->insertItem(i-1, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
         cBxIntervals->insertItem(i, QString::number(vectMarks.data()[i]) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i+1]));
+        cBxIntervals->setCurrentIndex(i-1);
         pBtnRemoveMark->setEnabled(true);
     }
 }
