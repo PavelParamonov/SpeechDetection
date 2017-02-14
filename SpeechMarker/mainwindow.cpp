@@ -50,6 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
     lbSamplesInWav = new QLabel("Samples in file:");
     edSamplesInWav = new QLineEdit();
     cBxIntervals = new QComboBox();
+    pBtnPlay = new QPushButton("Play");
+    pBtnPlay->setEnabled(false);
+    pBtnPlay->setMaximumWidth(4*11);
+    pBtnStop = new QPushButton("Stop");
+    pBtnStop->setMaximumWidth(4*11);
+    pBtnStop->setEnabled(false);
 //    cBxIntervals ->addItem(defaultLabel);
     cBxIntervals ->setMinimumWidth(120);
     cBxIntervals->setEnabled(false);
@@ -92,7 +98,12 @@ MainWindow::MainWindow(QWidget *parent) :
     hBoxLayControlButtons->addWidget(pBtnLoadMarkers);
     hBoxLayControlButtons->addWidget(pBtnSaveMarkers);
 
+    hBoxPlayStop = new QHBoxLayout();
+    hBoxPlayStop->addWidget(pBtnPlay);
+    hBoxPlayStop->addWidget(pBtnStop);
+
     vBoxLayMarksSettings = new QVBoxLayout();
+    vBoxLayMarksSettings->addLayout(hBoxPlayStop);
     vBoxLayMarksSettings->addWidget(pBtnZoomIn);
     vBoxLayMarksSettings->addWidget(pBtnZoomOut);
     vBoxLayMarksSettings->addWidget(cBxWindowSize);
@@ -134,6 +145,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
     connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
     connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
+    connect(pBtnPlay, SIGNAL(clicked()), this, SLOT(pBtnPlayClicked()));
+    connect(pBtnStop, SIGNAL(clicked()), this, SLOT(pBtnStopClicked()));
     connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
     connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
     connect(graphArea, SIGNAL(precalculatedArraysReady()), this, SLOT(drawPrecalculatedArray()));
@@ -367,6 +380,18 @@ void MainWindow::pBtnZoomOutClicked()
     graphArea->updatePlot();
 }
 
+void MainWindow::pBtnPlayClicked()
+{
+    pBtnStop->setEnabled(true);
+    pBtnPlay->setEnabled(false);
+}
+
+void MainWindow::pBtnStopClicked()
+{
+    pBtnStop->setEnabled(false);
+    pBtnPlay->setEnabled(true);
+}
+
 void MainWindow::pBtnLoadWavClicked()
 {
 //    For Windows:
@@ -468,6 +493,8 @@ void MainWindow::drawPrecalculatedArray()
     }
     // Disable "Remove Mark" button because there are no marks yet:
     pBtnRemoveMark->setEnabled(false);
+    // Disable "Stop" button because it must be enabled only when playback:
+    pBtnStop->setEnabled(false);
     // ---
     sBarPlotScroller->setMinimum(0);
     sBarPlotScroller->setMaximum(0);

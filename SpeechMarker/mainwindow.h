@@ -35,6 +35,8 @@ public slots:
     void pBtnRemoveMarkClicked();
     void pBtnZoomInClicked();
     void pBtnZoomOutClicked();
+    void pBtnPlayClicked();
+    void pBtnStopClicked();
     void cBxMarkTypeCurrentIndexChanged(const QString & text);
     void cBxIntervalsCurrentIndexChanged(int index);
     void edMarkerPositionTextEdited(const QString &newText);
@@ -48,12 +50,12 @@ public slots:
 private:
     // GIU members:
     RenderArea  *graphArea;
-    QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut, *pBtnRemoveMark;
+    QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut, *pBtnRemoveMark, *pBtnPlay, *pBtnStop;
     QComboBox   *cBxMarkType, *cBxWindowSize, *cBxIntervals;
     QLabel      *lbCurrentWavFile, *lbWavFileSamplRate, *lbWavFileBitsPerSample, *lbMarkerPosition, *lbSamplesInWav;
     QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample, *edMarkerPosition, *edSamplesInWav;
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
-    QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain;
+    QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain, *hBoxPlayStop;
     QScrollBar  *sBarPlotScroller;
     // Other members:
     QVector<int>    vectSamples, vectMarks;
