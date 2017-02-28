@@ -1,10 +1,11 @@
 #include "workerwavfilereader.h"
 #include <QFile>
 #include <QDataStream>
+#include <QByteArray>
 
-WorkerWavFileReader::WorkerWavFileReader(wavHeader *headerPtr, QVector<int> *vectSamplesPtr, QString &inputFileName, QObject *parent) : QObject(parent)
+WorkerWavFileReader::WorkerWavFileReader(wavHeader *headerPtr, QVector<int> *vectSamplesPtr, QByteArray *rawWavBytes, QString &inputFileName, QObject *parent) : QObject(parent)
 {
-    prtWavHeader=headerPtr; ptrVectSamples=vectSamplesPtr; wavFileName = inputFileName;
+    prtWavHeader=headerPtr; ptrVectSamples=vectSamplesPtr; wavFileName = inputFileName; ptrByteArr = rawWavBytes;
 }
 
 void WorkerWavFileReader::process()
@@ -40,17 +41,23 @@ void WorkerWavFileReader::process()
             inFile.readRawData(reinterpret_cast<char *>(&prtWavHeader->subchunk2Size), sizeof(prtWavHeader->subchunk2Size));
             ptrVectSamples->clear();
             ptrVectSamples->resize(prtWavHeader->subchunk2Size/(prtWavHeader->bitsPerSample/8));
+            // reading raw bytes:
+            ptrByteArr->clear();
+            ptrByteArr->resize(prtWavHeader->subchunk2Size);
+            bytesRead = inFile.readRawData(ptrByteArr->data(), ptrByteArr->length());
+            // ------------------
             emit samplesInWavToRead(ptrVectSamples->length());
             for(int i=0; i<ptrVectSamples->length();i++) {
                 switch (prtWavHeader->bitsPerSample/8) {
                 case 1:
+                    // Could be done simplier! I just copied it from uShort version lower:
                     unsigned char charBuffer;
-                    inFile.readRawData(reinterpret_cast<char *>(&charBuffer), sizeof(charBuffer));
+                    charBuffer = *(reinterpret_cast<unsigned short *>(ptrByteArr->data()+ i*prtWavHeader->bitsPerSample/8));
                     ptrVectSamples->data()[i] = static_cast<int>(charBuffer);
                     break;
                 case 2:
                     signed short shortBuffer;
-                    inFile.readRawData(reinterpret_cast<char *>(&shortBuffer), sizeof(shortBuffer));
+                    shortBuffer = *(reinterpret_cast<signed short *>(ptrByteArr->data()+ i*prtWavHeader->bitsPerSample/8));
                     ptrVectSamples->data()[i] = static_cast<int>(shortBuffer);
                     break;
                 }

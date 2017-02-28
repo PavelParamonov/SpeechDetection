@@ -27,11 +27,13 @@ struct wavHeader {
     quint32 subchunk2Size;
 };
 
+class QByteArray;
+
 class WorkerWavFileReader : public QObject
 {
     Q_OBJECT
 public:
-    explicit WorkerWavFileReader(wavHeader *headerPtr, QVector<int> *vectSamplesPtr, QString &inputFileName, QObject *parent = 0);
+    explicit WorkerWavFileReader(wavHeader *headerPtr, QVector<int> *vectSamplesPtr, QByteArray *rawWavBytes, QString &inputFileName, QObject *parent = 0);
 public slots:
     void process();
 signals:
@@ -42,6 +44,7 @@ signals:
 private:
     wavHeader *prtWavHeader;
     QVector<int> *ptrVectSamples;
+    QByteArray *ptrByteArr;
     QString wavFileName;
 };
 

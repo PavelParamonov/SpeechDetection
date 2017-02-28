@@ -10,6 +10,10 @@
 #include <QList>
 #include <QThread>
 
+#include <QtMultimedia/QAudioOutput>
+#include <QtMultimedia/QAudioFormat>
+
+#include <QAudioDeviceInfo>
 
 #include <iostream>
 
@@ -384,6 +388,49 @@ void MainWindow::pBtnPlayClicked()
 {
     pBtnStop->setEnabled(true);
     pBtnPlay->setEnabled(false);
+
+    wavDataToPlay.setData(byteArrRawWav);
+    wavDataToPlay.open(QIODevice::ReadOnly);
+    QAudioFormat format;
+    format.setSampleRate(wavFileHeader.sampleRate);
+    format.setChannelCount(wavFileHeader.numChannels);
+    format.setSampleSize(wavFileHeader.bitsPerSample);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::UnSignedInt);
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if (!info.isFormatSupported(format)) {
+        QMessageBox::critical(this, "SpeechMarker Error", "Raw audio format not supported by backend, cannot play audio.");
+        return;
+    }
+    audio = new QAudioOutput(format, this);
+    connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(AudioOutputStateChanged(QAudio::State)));
+    audio->start(&wavDataToPlay);
+}
+
+void MainWindow::AudioOutputStateChanged(QAudio::State newState)
+{
+    switch (newState) {
+            case QAudio::IdleState:
+                // Finished playing (no more data)
+                audio->stop();
+                wavDataToPlay.close();
+                delete audio;
+                pBtnPlay->setEnabled(true);
+                pBtnStop->setEnabled(false);
+                break;
+
+            case QAudio::StoppedState:
+                // Stopped for other reasons
+                if (audio->error() != QAudio::NoError) {
+                    // Error handling
+                }
+                break;
+
+            default:
+                // ... other cases as appropriate
+                break;
+        }
 }
 
 void MainWindow::pBtnStopClicked()
@@ -411,7 +458,7 @@ void MainWindow::pBtnLoadWavClicked()
     QString wavFileName = QFileDialog::getOpenFileName(this, "Save Marks", QDir::currentPath(), "*.wav");
     graphArea->setState(INACTIVE, "Reading wav file...");
     graphArea->updatePlot();
-    WorkerWavFileReader *worker = new WorkerWavFileReader(&wavFileHeader, &vectSamples, wavFileName);
+    WorkerWavFileReader *worker = new WorkerWavFileReader(&wavFileHeader, &vectSamples, &byteArrRawWav, wavFileName);
     QThread *new_thread = new QThread;
     worker->moveToThread(new_thread);
     connect(new_thread, SIGNAL(started()), worker, SLOT(process()));

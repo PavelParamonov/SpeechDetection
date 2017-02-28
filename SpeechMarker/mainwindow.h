@@ -12,9 +12,14 @@
 #include <QVector>
 #include <QProgressBar>
 
+#include <QtMultimedia/QAudio>
+#include <QByteArray>
+#include <QBuffer>
+
 #include "workerwavfilereader.h"
 
 class RenderArea;
+class QAudioOutput;
 
 #define defaultLabel "??"
 #define zoomCoeff 1.5
@@ -46,6 +51,7 @@ public slots:
     void prBarOpenWavProgressMaxValueChanged(int value);
     void processWavReaderResult(wavReaderErrCode errCode, QString wavFileName);
     void drawPrecalculatedArray();
+    void AudioOutputStateChanged(QAudio::State newState);
 
 private:
     // GIU members:
@@ -57,13 +63,16 @@ private:
     QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
     QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain, *hBoxPlayStop;
     QScrollBar  *sBarPlotScroller;
+    QProgressBar *prBarOpenWavProgress;
     // Other members:
     QVector<int>    vectSamples, vectMarks;
     QVector<QString> vectLabels;
     int markerPosition;
     int visibleSamplesCnt;
     wavHeader wavFileHeader;
-    QProgressBar *prBarOpenWavProgress;
+    QAudioOutput* audio;
+    QByteArray byteArrRawWav;
+    QBuffer wavDataToPlay;
     bool *previousEnabledState;
     // Private functions:
 };
