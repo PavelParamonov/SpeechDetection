@@ -53,6 +53,7 @@ public slots:
     void drawPrecalculatedArray();
     void AudioOutputStateChanged(QAudio::State newState);
     void audioNotifyProcess();
+    void startPlayback(int byteOffset);
 
 private:
     // GIU members:

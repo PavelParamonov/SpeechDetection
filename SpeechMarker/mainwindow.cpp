@@ -184,6 +184,11 @@ void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
     // Changing of text also invokes graphArea update, so no need
     // to call it manually.
     edMarkerPosition->setText(QString::number(markerPosition));
+    if(wavDataToPlay.isOpen()) {
+        audio->stop();
+        int byteOffset = markerPosition*wavFileHeader.bitsPerSample/8;
+        startPlayback(byteOffset);
+    }
 }
 
 void MainWindow::edMarkerPositionTextEdited(const QString &newText)
@@ -390,25 +395,7 @@ void MainWindow::pBtnPlayClicked()
     pBtnPlay->setEnabled(false);
 
     int byteOffset = markerPosition*wavFileHeader.bitsPerSample/8;
-    wavDataToPlay.setData(byteArrRawWav.right(byteArrRawWav.length()-byteOffset));
-    wavDataToPlay.open(QIODevice::ReadOnly);
-    QAudioFormat format;
-    format.setSampleRate(wavFileHeader.sampleRate);
-    format.setChannelCount(wavFileHeader.numChannels);
-    format.setSampleSize(wavFileHeader.bitsPerSample);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::UnSignedInt);
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-    if (!info.isFormatSupported(format)) {
-        QMessageBox::critical(this, "SpeechMarker Error", "Raw audio format not supported by backend, cannot play audio.");
-        return;
-    }
-    audio = new QAudioOutput(format, this);
-    audio->setNotifyInterval(100);
-    connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(AudioOutputStateChanged(QAudio::State)));
-    connect(audio, SIGNAL(notify()), this, SLOT(audioNotifyProcess()));
-    audio->start(&wavDataToPlay);
+    startPlayback(byteOffset);
 }
 
 void MainWindow::AudioOutputStateChanged(QAudio::State newState)
@@ -449,6 +436,29 @@ void MainWindow::audioNotifyProcess()
 {
     markerPosition += audio->notifyInterval()*wavFileHeader.sampleRate/1000;
     graphArea->updatePlot();
+}
+
+void MainWindow::startPlayback(int byteOffset)
+{
+    wavDataToPlay.setData(byteArrRawWav.right(byteArrRawWav.length()-byteOffset));
+    wavDataToPlay.open(QIODevice::ReadOnly);
+    QAudioFormat format;
+    format.setSampleRate(wavFileHeader.sampleRate);
+    format.setChannelCount(wavFileHeader.numChannels);
+    format.setSampleSize(wavFileHeader.bitsPerSample);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::UnSignedInt);
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if (!info.isFormatSupported(format)) {
+        QMessageBox::critical(this, "SpeechMarker Error", "Raw audio format not supported by backend, cannot play audio.");
+        return;
+    }
+    audio = new QAudioOutput(format, this);
+    audio->setNotifyInterval(100);
+    connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(AudioOutputStateChanged(QAudio::State)));
+    connect(audio, SIGNAL(notify()), this, SLOT(audioNotifyProcess()));
+    audio->start(&wavDataToPlay);
 }
 
 void MainWindow::pBtnLoadWavClicked()
