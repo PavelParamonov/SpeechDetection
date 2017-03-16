@@ -23,6 +23,7 @@ public:
     void setSampleMaxValue(int v) {maxSampleValue=v;}
     void setSelectedInterval(int ind) {selectedInterval=ind;}
     void setVisibleBorders(int left, int right) {leftVisibleBorder = left; rightVisibleBorder = right;}
+    int getRightVisibleBorder() {return rightVisibleBorder;}
     void updatePlot();
     void preparePrecalculatedArrays();  // Prepare pre-calsulated extrema arrays for drawing
     void setState(RenderAreaState newState, QString newMessage=QString("")) {state = newState; inactiveMessage = newMessage;}

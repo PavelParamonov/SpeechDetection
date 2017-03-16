@@ -393,7 +393,6 @@ void MainWindow::pBtnPlayClicked()
 {
     pBtnStop->setEnabled(true);
     pBtnPlay->setEnabled(false);
-
     int byteOffset = markerPosition*wavFileHeader.bitsPerSample/8;
     startPlayback(byteOffset);
 }
@@ -416,6 +415,7 @@ void MainWindow::AudioOutputStateChanged(QAudio::State newState)
                     pBtnPlay->setEnabled(true);
                     QMessageBox::critical(this, "SpeechMarker Error", "Some nasty error occured while playback.");
                 }
+
                 wavDataToPlay.close();
                 delete audio;
                 break;
@@ -435,7 +435,10 @@ void MainWindow::pBtnStopClicked()
 void MainWindow::audioNotifyProcess()
 {
     markerPosition += audio->notifyInterval()*wavFileHeader.sampleRate/1000;
-    graphArea->updatePlot();
+    if(markerPosition>graphArea->getRightVisibleBorder())
+        sBarPlotScroller->setValue(sBarPlotScroller->value() + 0.1*wavFileHeader.sampleRate);
+    else
+        graphArea->updatePlot();
 }
 
 void MainWindow::startPlayback(int byteOffset)
