@@ -389,7 +389,8 @@ void MainWindow::pBtnPlayClicked()
     pBtnStop->setEnabled(true);
     pBtnPlay->setEnabled(false);
 
-    wavDataToPlay.setData(byteArrRawWav);
+    int byteOffset = markerPosition*wavFileHeader.bitsPerSample/8;
+    wavDataToPlay.setData(byteArrRawWav.right(byteArrRawWav.length()-byteOffset));
     wavDataToPlay.open(QIODevice::ReadOnly);
     QAudioFormat format;
     format.setSampleRate(wavFileHeader.sampleRate);
