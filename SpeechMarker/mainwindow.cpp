@@ -414,8 +414,6 @@ void MainWindow::AudioOutputStateChanged(QAudio::State newState)
             case QAudio::IdleState:
                 // Finished playing (no more data)
                 audio->stop();
-                wavDataToPlay.close();
-                delete audio;
                 pBtnPlay->setEnabled(true);
                 pBtnStop->setEnabled(false);
                 break;
@@ -424,7 +422,12 @@ void MainWindow::AudioOutputStateChanged(QAudio::State newState)
                 // Stopped for other reasons
                 if (audio->error() != QAudio::NoError) {
                     // Error handling
+                    pBtnStop->setEnabled(false);
+                    pBtnPlay->setEnabled(true);
+                    QMessageBox::critical(this, "SpeechMarker Error", "Some nasty error occured while playback.");
                 }
+                wavDataToPlay.close();
+                delete audio;
                 break;
 
             default:
@@ -437,6 +440,7 @@ void MainWindow::pBtnStopClicked()
 {
     pBtnStop->setEnabled(false);
     pBtnPlay->setEnabled(true);
+    audio->stop();
 }
 
 void MainWindow::pBtnLoadWavClicked()
