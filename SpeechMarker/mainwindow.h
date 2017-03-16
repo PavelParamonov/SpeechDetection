@@ -52,6 +52,7 @@ public slots:
     void processWavReaderResult(wavReaderErrCode errCode, QString wavFileName);
     void drawPrecalculatedArray();
     void AudioOutputStateChanged(QAudio::State newState);
+    void audioNotifyProcess();
 
 private:
     // GIU members:

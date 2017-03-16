@@ -405,7 +405,9 @@ void MainWindow::pBtnPlayClicked()
         return;
     }
     audio = new QAudioOutput(format, this);
+    audio->setNotifyInterval(100);
     connect(audio, SIGNAL(stateChanged(QAudio::State)), this, SLOT(AudioOutputStateChanged(QAudio::State)));
+    connect(audio, SIGNAL(notify()), this, SLOT(audioNotifyProcess()));
     audio->start(&wavDataToPlay);
 }
 
@@ -430,7 +432,6 @@ void MainWindow::AudioOutputStateChanged(QAudio::State newState)
                 wavDataToPlay.close();
                 delete audio;
                 break;
-
             default:
                 // ... other cases as appropriate
                 break;
@@ -442,6 +443,12 @@ void MainWindow::pBtnStopClicked()
     pBtnStop->setEnabled(false);
     pBtnPlay->setEnabled(true);
     audio->stop();
+}
+
+void MainWindow::audioNotifyProcess()
+{
+    markerPosition += audio->notifyInterval()*wavFileHeader.sampleRate/1000;
+    graphArea->updatePlot();
 }
 
 void MainWindow::pBtnLoadWavClicked()
