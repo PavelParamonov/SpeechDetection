@@ -4,5 +4,6 @@ All that belongs to speech detection project.
 Currently only one part of this project is in more or less active development: SpeechMarker. It is a Qt-based marking application that visualizes .wav file (single channel), makes it possible to select regions of interest, and label these regions. It is  already usable, and many features are waiting to be implemented.
 It would also be great to start development of SpeechDetect - (maybe Qt-based) application for automatic detection of .wav regions that contain speech. Don't know when I'll start it though.
 ## Features
-
+![SpeechMarker_screenshot_1](/data/screenshots/sc_1.PNG)
+![SpeechMarker_screenshot_2](/data/screenshots/sc_2.PNG)
 ## Build
