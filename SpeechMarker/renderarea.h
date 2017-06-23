@@ -66,7 +66,7 @@ private:
     void drawSamples(QPainter &painter);
     void drawMarks(QPainter &painter);
     void prepareExtremaArray(QVector< QPair<int, int> > *vectExtrema, int samplesPerPixel);
-    void drawMessage(QPainter &painter, QString &message);
+    void drawMessage(QPainter &painter, const QString &message);
     void redrawPixmap();
 };
 

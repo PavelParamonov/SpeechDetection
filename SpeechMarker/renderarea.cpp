@@ -169,7 +169,7 @@ void RenderArea::drawSamples(QPainter &painter)
     }
 }
 
-void RenderArea::drawMessage(QPainter &painter, QString &message)
+void RenderArea::drawMessage(QPainter &painter, const QString &message)
 {
     int fontSize = 14;
     painter.setFont(QFont(QString("Times New Roman"), fontSize));
