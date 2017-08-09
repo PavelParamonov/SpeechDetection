@@ -20,7 +20,14 @@ It would also be great to start development of SpeechDetect - (maybe Qt-based) a
 
 ## Build
 
-1. As a Qt project.
-  1.1. Clone repository
-  1.2. Create an empty Qt project
-  1.3. Add all source files into project
+As a Qt project:
+1. Clone repository: `git clone git://github.com/PavelParamonov/SpeechDetection.git`
+2. Create "Empty qmake project" with Qt Creator
+3. Add all source files into project
+4. Add into project file (.pro):
+```
+QT += core gui multimedia
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+TARGET = SpeechMarker
+TEMPLATE = app
+```
