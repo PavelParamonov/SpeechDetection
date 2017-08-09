@@ -18,6 +18,10 @@ It would also be great to start development of SpeechDetect - (maybe Qt-based) a
 * Labels loading and saving
 * Plain text format for storing labels
 
+## OS support
+
+Builds and works fine on both Windows 7 and Ubuntu 16.04.
+
 ## Build
 
 As a Qt project:
