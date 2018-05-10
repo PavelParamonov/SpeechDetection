@@ -1,3 +1,5 @@
+#include "ui_mainwindow.h"
+
 #include "mainwindow.h"
 #include "renderarea.h"
 #include <QFile>
@@ -17,143 +19,144 @@
 
 #include <iostream>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QWidget(parent)
+MainWindow::MainWindow(QMainWindow *parent) :
+    QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    ui->setupUi(this);
     visibleSamplesCnt = 0;
     previousEnabledState = 0;
     markerPosition = 0;
-    graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
-    graphArea->setEnabled(false);
-    pBtnLoadWav = new QPushButton("Load Wav File");
-    pBtnSaveMarkers = new QPushButton("Save markers");
-    pBtnSaveMarkers->setEnabled(false);
-    pBtnLoadMarkers = new QPushButton("Load markers");
-    pBtnLoadMarkers->setEnabled(false);
-    pBtnPlaceMark = new QPushButton("Place mark");
-    pBtnPlaceMark->setEnabled(false);
-    pBtnZoomIn = new QPushButton("Zoom in");
-    pBtnZoomIn->setEnabled(false);
-    pBtnZoomOut = new QPushButton("Zoom Out");
-    pBtnZoomOut->setEnabled(false);
-    pBtnRemoveMark = new QPushButton("Remove mark");
-    pBtnRemoveMark->setEnabled(false);
-    lbCurrentWavFile = new QLabel("Wav File:");
-    lbWavFileSamplRate = new QLabel("Sample Rate:");
-    lbWavFileBitsPerSample = new QLabel("Bits per sample:");
-    edCurrentWavFile = new QLineEdit();
-    edCurrentWavFile->setEnabled(false);
-    edCurrentWavFile->setReadOnly(true);
-    edWavFileSamplRate = new QLineEdit();
-    edWavFileSamplRate->setEnabled(false);
-    edWavFileSamplRate->setReadOnly(true);
-    edWavFileSamplRate->setMaximumWidth(80);
-    lbMarkerPosition = new QLabel("Marker position: ");
-    edMarkerPosition = new QLineEdit();
-    edMarkerPosition->setEnabled(false);
-    lbSamplesInWav = new QLabel("Samples in file:");
-    edSamplesInWav = new QLineEdit();
-    cBxIntervals = new QComboBox();
-    pBtnPlay = new QPushButton("Play");
-    pBtnPlay->setEnabled(false);
-    pBtnPlay->setMaximumWidth(4*11);
-    pBtnStop = new QPushButton("Stop");
-    pBtnStop->setMaximumWidth(4*11);
-    pBtnStop->setEnabled(false);
-//    cBxIntervals ->addItem(defaultLabel);
-    cBxIntervals ->setMinimumWidth(120);
-    cBxIntervals->setEnabled(false);
-    edSamplesInWav->setEnabled(false);
-    edSamplesInWav->setReadOnly(true);
-    edWavFileBitsPerSample = new QLineEdit();
-    edWavFileBitsPerSample->setEnabled(false);
-    edWavFileBitsPerSample->setReadOnly(true);
-    edWavFileBitsPerSample->setMaximumWidth(60);
-    cBxMarkType = new QComboBox();
-    cBxMarkType->addItem(defaultLabel);
-    cBxMarkType->addItem("SL");
-    cBxMarkType->addItem("SP");
-    cBxMarkType->setMinimumWidth(80);
-    cBxMarkType->setEnabled(false);
-    cBxWindowSize = new QComboBox();
-    cBxWindowSize->setEnabled(false);
-    cBxWindowSize->addItem("1 sample");
-    cBxWindowSize->addItem("10 ms");
-    cBxWindowSize->addItem("16 ms");
-    cBxWindowSize->addItem("20 ms");
-    sBarPlotScroller = new QScrollBar(Qt::Horizontal);
-    sBarPlotScroller->setMinimum(0);
-    sBarPlotScroller->setMaximum(0);
+//    graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
+//    graphArea->setEnabled(false);
+//    pBtnLoadWav = new QPushButton("Load Wav File");
+//    pBtnSaveMarkers = new QPushButton("Save markers");
+//    pBtnSaveMarkers->setEnabled(false);
+//    pBtnLoadMarkers = new QPushButton("Load markers");
+//    pBtnLoadMarkers->setEnabled(false);
+//    pBtnPlaceMark = new QPushButton("Place mark");
+//    pBtnPlaceMark->setEnabled(false);
+//    pBtnZoomIn = new QPushButton("Zoom in");
+//    pBtnZoomIn->setEnabled(false);
+//    pBtnZoomOut = new QPushButton("Zoom Out");
+//    pBtnZoomOut->setEnabled(false);
+//    pBtnRemoveMark = new QPushButton("Remove mark");
+//    pBtnRemoveMark->setEnabled(false);
+//    lbCurrentWavFile = new QLabel("Wav File:");
+//    lbWavFileSamplRate = new QLabel("Sample Rate:");
+//    lbWavFileBitsPerSample = new QLabel("Bits per sample:");
+//    edCurrentWavFile = new QLineEdit();
+//    edCurrentWavFile->setEnabled(false);
+//    edCurrentWavFile->setReadOnly(true);
+//    edWavFileSamplRate = new QLineEdit();
+//    edWavFileSamplRate->setEnabled(false);
+//    edWavFileSamplRate->setReadOnly(true);
+//    edWavFileSamplRate->setMaximumWidth(80);
+//    lbMarkerPosition = new QLabel("Marker position: ");
+//    edMarkerPosition = new QLineEdit();
+//    edMarkerPosition->setEnabled(false);
+//    lbSamplesInWav = new QLabel("Samples in file:");
+//    edSamplesInWav = new QLineEdit();
+//    cBxIntervals = new QComboBox();
+//    pBtnPlay = new QPushButton("Play");
+//    pBtnPlay->setEnabled(false);
+//    pBtnPlay->setMaximumWidth(4*11);
+//    pBtnStop = new QPushButton("Stop");
+//    pBtnStop->setMaximumWidth(4*11);
+//    pBtnStop->setEnabled(false);
+////    cBxIntervals ->addItem(defaultLabel);
+//    cBxIntervals ->setMinimumWidth(120);
+//    cBxIntervals->setEnabled(false);
+//    edSamplesInWav->setEnabled(false);
+//    edSamplesInWav->setReadOnly(true);
+//    edWavFileBitsPerSample = new QLineEdit();
+//    edWavFileBitsPerSample->setEnabled(false);
+//    edWavFileBitsPerSample->setReadOnly(true);
+//    edWavFileBitsPerSample->setMaximumWidth(60);
+//    cBxMarkType = new QComboBox();
+//    cBxMarkType->addItem(defaultLabel);
+//    cBxMarkType->addItem("SL");
+//    cBxMarkType->addItem("SP");
+//    cBxMarkType->setMinimumWidth(80);
+//    cBxMarkType->setEnabled(false);
+//    cBxWindowSize = new QComboBox();
+//    cBxWindowSize->setEnabled(false);
+//    cBxWindowSize->addItem("1 sample");
+//    cBxWindowSize->addItem("10 ms");
+//    cBxWindowSize->addItem("16 ms");
+//    cBxWindowSize->addItem("20 ms");
+//    sBarPlotScroller = new QScrollBar(Qt::Horizontal);
+//    sBarPlotScroller->setMinimum(0);
+//    sBarPlotScroller->setMaximum(0);
 
-    // Progress bar construction:
-    prBarOpenWavProgress = new QProgressBar();
-    prBarOpenWavProgress->setOrientation(Qt::Horizontal);
+//    // Progress bar construction:
+//    prBarOpenWavProgress = new QProgressBar();
+//    prBarOpenWavProgress->setOrientation(Qt::Horizontal);
 
-    hBoxLayMarkerPosition = new QHBoxLayout();
-    hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
-    hBoxLayMarkerPosition ->addWidget(edMarkerPosition);
-    hBoxLayMarkerPosition ->addWidget(lbSamplesInWav);
-    hBoxLayMarkerPosition ->addWidget(edSamplesInWav);
-    hBoxLayMarkerPosition ->addWidget(cBxIntervals);
-    hBoxLayMarkerPosition-> addWidget(cBxMarkType);
+//    hBoxLayMarkerPosition = new QHBoxLayout();
+//    hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
+//    hBoxLayMarkerPosition ->addWidget(edMarkerPosition);
+//    hBoxLayMarkerPosition ->addWidget(lbSamplesInWav);
+//    hBoxLayMarkerPosition ->addWidget(edSamplesInWav);
+//    hBoxLayMarkerPosition ->addWidget(cBxIntervals);
+//    hBoxLayMarkerPosition-> addWidget(cBxMarkType);
 
-    hBoxLayControlButtons = new QHBoxLayout();
-    hBoxLayControlButtons->addWidget(pBtnLoadWav);
-    hBoxLayControlButtons->addWidget(pBtnLoadMarkers);
-    hBoxLayControlButtons->addWidget(pBtnSaveMarkers);
+//    hBoxLayControlButtons = new QHBoxLayout();
+//    hBoxLayControlButtons->addWidget(pBtnLoadWav);
+//    hBoxLayControlButtons->addWidget(pBtnLoadMarkers);
+//    hBoxLayControlButtons->addWidget(pBtnSaveMarkers);
 
-    hBoxPlayStop = new QHBoxLayout();
-    hBoxPlayStop->addWidget(pBtnPlay);
-    hBoxPlayStop->addWidget(pBtnStop);
+//    hBoxPlayStop = new QHBoxLayout();
+//    hBoxPlayStop->addWidget(pBtnPlay);
+//    hBoxPlayStop->addWidget(pBtnStop);
 
-    vBoxLayMarksSettings = new QVBoxLayout();
-    vBoxLayMarksSettings->addLayout(hBoxPlayStop);
-    vBoxLayMarksSettings->addWidget(pBtnZoomIn);
-    vBoxLayMarksSettings->addWidget(pBtnZoomOut);
-    vBoxLayMarksSettings->addWidget(cBxWindowSize);
-    vBoxLayMarksSettings->addWidget(pBtnPlaceMark);
-    vBoxLayMarksSettings->addWidget(pBtnRemoveMark);
+//    vBoxLayMarksSettings = new QVBoxLayout();
+//    vBoxLayMarksSettings->addLayout(hBoxPlayStop);
+//    vBoxLayMarksSettings->addWidget(pBtnZoomIn);
+//    vBoxLayMarksSettings->addWidget(pBtnZoomOut);
+//    vBoxLayMarksSettings->addWidget(cBxWindowSize);
+//    vBoxLayMarksSettings->addWidget(pBtnPlaceMark);
+//    vBoxLayMarksSettings->addWidget(pBtnRemoveMark);
 
-    hBoxLayWavFileLabel = new QHBoxLayout();
-    hBoxLayWavFileLabel->addWidget(lbCurrentWavFile);
-    hBoxLayWavFileLabel->addWidget(edCurrentWavFile);
-    hBoxLayWavFileLabel->addWidget(lbWavFileSamplRate);
-    hBoxLayWavFileLabel->addWidget(edWavFileSamplRate);
-    hBoxLayWavFileLabel->addWidget(lbWavFileBitsPerSample);
-    hBoxLayWavFileLabel->addWidget(edWavFileBitsPerSample);
+//    hBoxLayWavFileLabel = new QHBoxLayout();
+//    hBoxLayWavFileLabel->addWidget(lbCurrentWavFile);
+//    hBoxLayWavFileLabel->addWidget(edCurrentWavFile);
+//    hBoxLayWavFileLabel->addWidget(lbWavFileSamplRate);
+//    hBoxLayWavFileLabel->addWidget(edWavFileSamplRate);
+//    hBoxLayWavFileLabel->addWidget(lbWavFileBitsPerSample);
+//    hBoxLayWavFileLabel->addWidget(edWavFileBitsPerSample);
 
-    vBoxLayRenderControl = new QVBoxLayout();
-    vBoxLayRenderControl->addWidget(graphArea);
-    vBoxLayRenderControl->addWidget(sBarPlotScroller);
-    vBoxLayRenderControl->addLayout(hBoxLayMarkerPosition);
-    vBoxLayRenderControl->addLayout(hBoxLayControlButtons);
-    vBoxLayRenderControl->addLayout(hBoxLayWavFileLabel);
-    vBoxLayRenderControl->addWidget(prBarOpenWavProgress);
+//    vBoxLayRenderControl = new QVBoxLayout();
+//    vBoxLayRenderControl->addWidget(graphArea);
+//    vBoxLayRenderControl->addWidget(sBarPlotScroller);
+//    vBoxLayRenderControl->addLayout(hBoxLayMarkerPosition);
+//    vBoxLayRenderControl->addLayout(hBoxLayControlButtons);
+//    vBoxLayRenderControl->addLayout(hBoxLayWavFileLabel);
+//    vBoxLayRenderControl->addWidget(prBarOpenWavProgress);
 
-    hBoxLayMain = new QHBoxLayout();
-    hBoxLayMain->addLayout(vBoxLayRenderControl);
-    hBoxLayMain->addLayout(vBoxLayMarksSettings);
-    setLayout(hBoxLayMain);
+//    hBoxLayMain = new QHBoxLayout();
+//    hBoxLayMain->addLayout(vBoxLayRenderControl);
+//    hBoxLayMain->addLayout(vBoxLayMarksSettings);
+//    setLayout(hBoxLayMain);
 
-    setWindowTitle("Speech Marker");
+//    setWindowTitle("Speech Marker");
 
-    connect(pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
-    connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
-    connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
-    connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
-    //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
-    connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
-    connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
-    connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
-    connect(pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(pBtnLoadMarkersClicked()));
-    connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
-    connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
-    connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
-    connect(pBtnPlay, SIGNAL(clicked()), this, SLOT(pBtnPlayClicked()));
-    connect(pBtnStop, SIGNAL(clicked()), this, SLOT(pBtnStopClicked()));
-    connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
-    connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
-    connect(graphArea, SIGNAL(precalculatedArraysReady()), this, SLOT(drawPrecalculatedArray()));
+//    connect(pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
+//    connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
+//    connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
+//    connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
+//    //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
+//    connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
+//    connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
+//    connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
+//    connect(pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(pBtnLoadMarkersClicked()));
+//    connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
+//    connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
+//    connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
+//    connect(pBtnPlay, SIGNAL(clicked()), this, SLOT(pBtnPlayClicked()));
+//    connect(pBtnStop, SIGNAL(clicked()), this, SLOT(pBtnStopClicked()));
+//    connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
+//    connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
+//    connect(graphArea, SIGNAL(precalculatedArraysReady()), this, SLOT(drawPrecalculatedArray()));
 
     qRegisterMetaType<wavReaderErrCode>();
 }
@@ -580,6 +583,7 @@ void MainWindow::drawPrecalculatedArray()
 
 MainWindow::~MainWindow()
 {
-    delete pBtnLoadWav;
-    delete pBtnSaveMarkers;
+    delete ui;
+//    delete pBtnLoadWav;
+//    delete pBtnSaveMarkers;
 }

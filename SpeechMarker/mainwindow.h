@@ -21,6 +21,7 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QMainWindow>
 #include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
@@ -37,6 +38,10 @@
 
 #include "workerwavfilereader.h"
 
+namespace Ui {
+    class MainWindow;
+}
+
 class RenderArea;
 class QAudioOutput;
 
@@ -44,12 +49,12 @@ class QAudioOutput;
 #define zoomCoeff 1.5
 
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QMainWindow *parent = 0);
     ~MainWindow();
 public slots:
     void pBtnLoadWavClicked();
@@ -75,6 +80,7 @@ public slots:
     void startPlayback(int byteOffset);
 
 private:
+    Ui::MainWindow *ui;
     // GIU members:
     RenderArea  *graphArea;
     QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut, *pBtnRemoveMark, *pBtnPlay, *pBtnStop;

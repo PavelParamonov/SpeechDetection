@@ -22,3 +22,6 @@ HEADERS  += mainwindow.h \
     renderarea.h \
     workerwavfilereader.h \
     workerwavformwrecalculation.h
+
+FORMS += \
+    mainwindow.ui
