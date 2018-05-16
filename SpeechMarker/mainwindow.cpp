@@ -28,22 +28,7 @@ MainWindow::MainWindow(QMainWindow *parent) :
     markerPosition = 0;
     graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
     graphArea->setEnabled(false);
-//    pBtnLoadWav = new QPushButton("Load Wav File");
-//    pBtnSaveMarkers = new QPushButton("Save markers");
-//    pBtnSaveMarkers->setEnabled(false);
-//    pBtnLoadMarkers = new QPushButton("Load markers");
-//    pBtnLoadMarkers->setEnabled(false);
-//    pBtnPlaceMark = new QPushButton("Place mark");
-//    pBtnPlaceMark->setEnabled(false);
-//    pBtnZoomIn = new QPushButton("Zoom in");
-//    pBtnZoomIn->setEnabled(false);
-//    pBtnZoomOut = new QPushButton("Zoom Out");
-//    pBtnZoomOut->setEnabled(false);
-//    pBtnRemoveMark = new QPushButton("Remove mark");
-//    pBtnRemoveMark->setEnabled(false);
-//    lbCurrentWavFile = new QLabel("Wav File:");
-//    lbWavFileSamplRate = new QLabel("Sample Rate:");
-//    lbWavFileBitsPerSample = new QLabel("Bits per sample:");
+
 //    edCurrentWavFile = new QLineEdit();
 //    edCurrentWavFile->setEnabled(false);
 //    edCurrentWavFile->setReadOnly(true);
@@ -101,9 +86,9 @@ MainWindow::MainWindow(QMainWindow *parent) :
 //    hBoxLayMarkerPosition-> addWidget(cBxMarkType);
 
 //    hBoxLayControlButtons = new QHBoxLayout();
-//    hBoxLayControlButtons->addWidget(pBtnLoadWav);
-//    hBoxLayControlButtons->addWidget(pBtnLoadMarkers);
-//    hBoxLayControlButtons->addWidget(pBtnSaveMarkers);
+//    hBoxLayControlButtons->addWidget(ui->pBtnLoadWav);
+//    hBoxLayControlButtons->addWidget(ui->pBtnLoadMarkers);
+//    hBoxLayControlButtons->addWidget(ui->pBtnSaveMarkers);
 
 //    hBoxPlayStop = new QHBoxLayout();
 //    hBoxPlayStop->addWidget(pBtnPlay);
@@ -141,15 +126,15 @@ MainWindow::MainWindow(QMainWindow *parent) :
 
 //    setWindowTitle("Speech Marker");
 
-//    connect(pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
+//    connect(ui->pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
 //    connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
 //    connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
 //    connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
 //    //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
 //    connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
 //    connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
-//    connect(pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(pBtnSaveMarkersClicked()));
-//    connect(pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(pBtnLoadMarkersClicked()));
+//    connect(ui->pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(ui->pBtnSaveMarkersClicked()));
+//    connect(ui->pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(ui->pBtnLoadMarkersClicked()));
 //    connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
 //    connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
 //    connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
@@ -216,7 +201,7 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
 
 void MainWindow::pBtnPlaceMarkClicked()
 {
-    pBtnSaveMarkers->setEnabled(true);
+    ui->pBtnSaveMarkers->setEnabled(true);
     if(!vectMarks.contains(markerPosition)) {
         int i=0;
         while((i<vectMarks.length()) && (markerPosition>vectMarks.data()[i])) {i++;}
@@ -585,6 +570,4 @@ void MainWindow::drawPrecalculatedArray()
 MainWindow::~MainWindow()
 {
     delete ui;
-//    delete pBtnLoadWav;
-//    delete pBtnSaveMarkers;
 }

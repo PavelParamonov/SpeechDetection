@@ -65,6 +65,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pBtnLoadMarkers">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Load Markers</string>
           </property>
@@ -72,6 +75,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pBtnSaveMarkers">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Save Markers</string>
           </property>
@@ -148,6 +154,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pBtnZoomIn">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Zoom In</string>
         </property>
@@ -155,6 +164,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pBtnZoomOut">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Zoom out</string>
         </property>
@@ -171,6 +183,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pBtnPlaceMark">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Place Mark</string>
         </property>
@@ -178,6 +193,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pBtnRemoveMark">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Remove Mark</string>
         </property>
