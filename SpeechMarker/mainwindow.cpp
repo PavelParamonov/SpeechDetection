@@ -26,8 +26,8 @@ MainWindow::MainWindow(QMainWindow *parent) :
     visibleSamplesCnt = 0;
     previousEnabledState = 0;
     markerPosition = 0;
-//    graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
-//    graphArea->setEnabled(false);
+    graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
+    graphArea->setEnabled(false);
 //    pBtnLoadWav = new QPushButton("Load Wav File");
 //    pBtnSaveMarkers = new QPushButton("Save markers");
 //    pBtnSaveMarkers->setEnabled(false);
@@ -126,7 +126,8 @@ MainWindow::MainWindow(QMainWindow *parent) :
 //    hBoxLayWavFileLabel->addWidget(edWavFileBitsPerSample);
 
 //    vBoxLayRenderControl = new QVBoxLayout();
-//    vBoxLayRenderControl->addWidget(graphArea);
+
+    ui->vBoxLayRenderControl->insertWidget(0, graphArea);
 //    vBoxLayRenderControl->addWidget(sBarPlotScroller);
 //    vBoxLayRenderControl->addLayout(hBoxLayMarkerPosition);
 //    vBoxLayRenderControl->addLayout(hBoxLayControlButtons);
