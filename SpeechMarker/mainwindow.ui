@@ -34,7 +34,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="edMarkerPosition"/>
+         <widget class="QLineEdit" name="edMarkerPosition">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="lbSamplesInWav">
@@ -44,7 +48,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="edSamplesInWav"/>
+         <widget class="QLineEdit" name="edSamplesInWav">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QComboBox" name="cBxIntervals"/>
@@ -95,7 +106,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="edCurrentWavFile"/>
+         <widget class="QLineEdit" name="edCurrentWavFile">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="lbWavFileSamplRate">
@@ -105,7 +123,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="edWavFileSamplRate"/>
+         <widget class="QLineEdit" name="edWavFileSamplRate">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="lbWavFileBitsPerSample">

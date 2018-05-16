@@ -29,18 +29,7 @@ MainWindow::MainWindow(QMainWindow *parent) :
     graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
     graphArea->setEnabled(false);
 
-//    edCurrentWavFile = new QLineEdit();
-//    edCurrentWavFile->setEnabled(false);
-//    edCurrentWavFile->setReadOnly(true);
-//    edWavFileSamplRate = new QLineEdit();
-//    edWavFileSamplRate->setEnabled(false);
-//    edWavFileSamplRate->setReadOnly(true);
-//    edWavFileSamplRate->setMaximumWidth(80);
-//    lbMarkerPosition = new QLabel("Marker position: ");
-//    edMarkerPosition = new QLineEdit();
-//    edMarkerPosition->setEnabled(false);
-//    lbSamplesInWav = new QLabel("Samples in file:");
-//    edSamplesInWav = new QLineEdit();
+
 //    cBxIntervals = new QComboBox();
 //    pBtnPlay = new QPushButton("Play");
 //    pBtnPlay->setEnabled(false);
@@ -51,8 +40,7 @@ MainWindow::MainWindow(QMainWindow *parent) :
 ////    cBxIntervals ->addItem(defaultLabel);
 //    cBxIntervals ->setMinimumWidth(120);
 //    cBxIntervals->setEnabled(false);
-//    edSamplesInWav->setEnabled(false);
-//    edSamplesInWav->setReadOnly(true);
+
 //    edWavFileBitsPerSample = new QLineEdit();
 //    edWavFileBitsPerSample->setEnabled(false);
 //    edWavFileBitsPerSample->setReadOnly(true);
@@ -172,7 +160,7 @@ void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
     markerPosition = newPosition;
     // Changing of text also invokes graphArea update, so no need
     // to call it manually.
-    edMarkerPosition->setText(QString::number(markerPosition));
+    ui->edMarkerPosition->setText(QString::number(markerPosition));
     if(wavDataToPlay.isOpen()) {
         audio->stop();
         int byteOffset = markerPosition*wavFileHeader.bitsPerSample/8;
@@ -186,7 +174,7 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
     int uIntMarkerPosition = newText.toUInt(&ok);
     if(ok && (uIntMarkerPosition>=0) && (uIntMarkerPosition<vectSamples.length())) {
         // Set normal color:
-        edMarkerPosition->setStyleSheet("QLineEdit{background: white;}");
+        ui->edMarkerPosition->setStyleSheet("QLineEdit{background: white;}");
         // Unlock "Place marker button"
         pBtnPlaceMark->setEnabled(true);
         markerPosition = uIntMarkerPosition;
@@ -194,7 +182,7 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
     }
     else {
         // Change color to disturbingly red:
-        edMarkerPosition->setStyleSheet("QLineEdit{background: red;}");
+        ui->edMarkerPosition->setStyleSheet("QLineEdit{background: red;}");
         pBtnPlaceMark->setEnabled(false);
     }
 }
@@ -292,7 +280,7 @@ void MainWindow::pBtnLoadMarkersClicked()
             if(labelsFile.open(QIODevice::ReadOnly)) {
                 // Block signals from cBxIntervals and edMarkerPosition to prevent excessive updates of graphArea:
                 cBxIntervals->blockSignals(true);
-                edMarkerPosition->blockSignals(true);
+                ui->edMarkerPosition->blockSignals(true);
                 // Clear all marks and labels:
                 vectMarks.clear();
                 vectLabels.clear();
@@ -312,10 +300,10 @@ void MainWindow::pBtnLoadMarkersClicked()
                     cBxIntervals->addItem(QString::number(vectMarks[i]) + "-" + QString::number(vectMarks[i+1]));
                 }
                 markerPosition = 0;
-                edMarkerPosition->setText(QString::number(markerPosition));
+                ui->edMarkerPosition->setText(QString::number(markerPosition));
                 // Unblock signals emission and force update of graphArea:
                 cBxIntervals->blockSignals(false);
-                edMarkerPosition->blockSignals(false);
+                ui->edMarkerPosition->blockSignals(false);
                 // --
                 graphArea->setSelectedInterval(0);
                 graphArea->updatePlot();
@@ -516,10 +504,10 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         // Then MainWidget waits for signal precalculatedArraysReady() from graphArea which is connected to slot drawPrecalculatedArray()
         //-------------------------------------------------------------------------------------------------------------------------------
         graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
-        // Block signals from edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
-        edMarkerPosition->blockSignals(true);
+        // Block signals from ui->edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
+        ui->edMarkerPosition->blockSignals(true);
         cBxIntervals->blockSignals(true);
-        edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
+        ui->edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
         edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
         edSamplesInWav->setText(QString::number(vectSamples.length()));
         // Add default label that covers the whole wav:
@@ -535,9 +523,9 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
         // Initial marker position:
         markerPosition = 0;
-        edMarkerPosition->setText(QString::number(markerPosition));
+        ui->edMarkerPosition->setText(QString::number(markerPosition));
         // Type wav file information:
-        edCurrentWavFile->setText(wavFileName);
+        ui->edCurrentWavFile->setText(wavFileName);
         break;
     default:
         break;
@@ -559,8 +547,8 @@ void MainWindow::drawPrecalculatedArray()
     // ---
     sBarPlotScroller->setMinimum(0);
     sBarPlotScroller->setMaximum(0);
-    // Unblock signals emission from edMarkerPosition and cBxIntervals and force update for graphArea:
-    edMarkerPosition->blockSignals(false);
+    // Unblock signals emission from ui->edMarkerPosition and cBxIntervals and force update for graphArea:
+    ui->edMarkerPosition->blockSignals(false);
     cBxIntervals->blockSignals(false);
     graphArea->setEnabled(true);
     graphArea->setState(ACTIVEDRAWING);
