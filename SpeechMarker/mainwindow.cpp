@@ -29,108 +29,29 @@ MainWindow::MainWindow(QMainWindow *parent) :
     graphArea = new RenderArea(&vectSamples, &vectMarks, &vectLabels, &markerPosition);
     graphArea->setEnabled(false);
 
+    ui->cBxIntervals->blockSignals(true);
+    ui->cBxIntervals->addItem(QString(defaultLabel));
+    ui->cBxIntervals->blockSignals(false);
 
-//    cBxIntervals = new QComboBox();
-//    pBtnPlay = new QPushButton("Play");
-//    pBtnPlay->setEnabled(false);
-//    pBtnPlay->setMaximumWidth(4*11);
-//    pBtnStop = new QPushButton("Stop");
-//    pBtnStop->setMaximumWidth(4*11);
-//    pBtnStop->setEnabled(false);
-////    cBxIntervals ->addItem(defaultLabel);
-//    cBxIntervals ->setMinimumWidth(120);
-//    cBxIntervals->setEnabled(false);
+    ui->cBxMarkType->blockSignals(true);
+    ui->cBxMarkType->addItem(defaultLabel);
+    ui->cBxMarkType->addItem("SL");
+    ui->cBxMarkType->addItem("SP");
+    ui->cBxMarkType->blockSignals(false);
 
-//    edWavFileBitsPerSample = new QLineEdit();
-//    edWavFileBitsPerSample->setEnabled(false);
-//    edWavFileBitsPerSample->setReadOnly(true);
-//    edWavFileBitsPerSample->setMaximumWidth(60);
-//    cBxMarkType = new QComboBox();
-//    cBxMarkType->addItem(defaultLabel);
-//    cBxMarkType->addItem("SL");
-//    cBxMarkType->addItem("SP");
-//    cBxMarkType->setMinimumWidth(80);
-//    cBxMarkType->setEnabled(false);
-//    cBxWindowSize = new QComboBox();
-//    cBxWindowSize->setEnabled(false);
-//    cBxWindowSize->addItem("1 sample");
-//    cBxWindowSize->addItem("10 ms");
-//    cBxWindowSize->addItem("16 ms");
-//    cBxWindowSize->addItem("20 ms");
-//    sBarPlotScroller = new QScrollBar(Qt::Horizontal);
-//    sBarPlotScroller->setMinimum(0);
-//    sBarPlotScroller->setMaximum(0);
-
-//    // Progress bar construction:
-//    prBarOpenWavProgress = new QProgressBar();
-//    prBarOpenWavProgress->setOrientation(Qt::Horizontal);
-
-//    hBoxLayMarkerPosition = new QHBoxLayout();
-//    hBoxLayMarkerPosition ->addWidget(lbMarkerPosition);
-//    hBoxLayMarkerPosition ->addWidget(edMarkerPosition);
-//    hBoxLayMarkerPosition ->addWidget(lbSamplesInWav);
-//    hBoxLayMarkerPosition ->addWidget(edSamplesInWav);
-//    hBoxLayMarkerPosition ->addWidget(cBxIntervals);
-//    hBoxLayMarkerPosition-> addWidget(cBxMarkType);
-
-//    hBoxLayControlButtons = new QHBoxLayout();
-//    hBoxLayControlButtons->addWidget(ui->pBtnLoadWav);
-//    hBoxLayControlButtons->addWidget(ui->pBtnLoadMarkers);
-//    hBoxLayControlButtons->addWidget(ui->pBtnSaveMarkers);
-
-//    hBoxPlayStop = new QHBoxLayout();
-//    hBoxPlayStop->addWidget(pBtnPlay);
-//    hBoxPlayStop->addWidget(pBtnStop);
-
-//    vBoxLayMarksSettings = new QVBoxLayout();
-//    vBoxLayMarksSettings->addLayout(hBoxPlayStop);
-//    vBoxLayMarksSettings->addWidget(pBtnZoomIn);
-//    vBoxLayMarksSettings->addWidget(pBtnZoomOut);
-//    vBoxLayMarksSettings->addWidget(cBxWindowSize);
-//    vBoxLayMarksSettings->addWidget(pBtnPlaceMark);
-//    vBoxLayMarksSettings->addWidget(pBtnRemoveMark);
-
-//    hBoxLayWavFileLabel = new QHBoxLayout();
-//    hBoxLayWavFileLabel->addWidget(lbCurrentWavFile);
-//    hBoxLayWavFileLabel->addWidget(edCurrentWavFile);
-//    hBoxLayWavFileLabel->addWidget(lbWavFileSamplRate);
-//    hBoxLayWavFileLabel->addWidget(edWavFileSamplRate);
-//    hBoxLayWavFileLabel->addWidget(lbWavFileBitsPerSample);
-//    hBoxLayWavFileLabel->addWidget(edWavFileBitsPerSample);
-
-//    vBoxLayRenderControl = new QVBoxLayout();
+    ui->cBxWindowSize->blockSignals(true);
+    ui->cBxWindowSize->addItem("1 sample");
+//    ui->cBxWindowSize->addItem("10 ms");
+//    ui->cBxWindowSize->addItem("16 ms");
+//    ui->cBxWindowSize->addItem("20 ms");
+    ui->cBxWindowSize->blockSignals(false);
 
     ui->vBoxLayRenderControl->insertWidget(0, graphArea);
-//    vBoxLayRenderControl->addWidget(sBarPlotScroller);
-//    vBoxLayRenderControl->addLayout(hBoxLayMarkerPosition);
-//    vBoxLayRenderControl->addLayout(hBoxLayControlButtons);
-//    vBoxLayRenderControl->addLayout(hBoxLayWavFileLabel);
-//    vBoxLayRenderControl->addWidget(prBarOpenWavProgress);
 
-//    hBoxLayMain = new QHBoxLayout();
-//    hBoxLayMain->addLayout(vBoxLayRenderControl);
-//    hBoxLayMain->addLayout(vBoxLayMarksSettings);
-//    setLayout(hBoxLayMain);
+    connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
 
-//    setWindowTitle("Speech Marker");
-
-//    connect(ui->pBtnLoadWav, SIGNAL(clicked()), this, SLOT(pBtnLoadWavClicked()));
-//    connect(pBtnPlaceMark, SIGNAL(clicked()), this, SLOT(pBtnPlaceMarkClicked()));
-//    connect(edMarkerPosition, SIGNAL(textChanged(QString)), this, SLOT(edMarkerPositionTextEdited(QString)));
-//    connect(graphArea, SIGNAL(markerPositionChanged(int)), this, SLOT(graphAreaMarkerPositionChanged(int)));
-//    //connect(cBxIntervals, static_cast<void(QComboBox::*)(int)>);
-//    connect(cBxIntervals, SIGNAL(currentIndexChanged(int)), this, SLOT(cBxIntervalsCurrentIndexChanged(int)));
-//    connect(cBxMarkType, SIGNAL(currentIndexChanged(QString)), this, SLOT(cBxMarkTypeCurrentIndexChanged(QString)));
-//    connect(ui->pBtnSaveMarkers, SIGNAL(clicked()), this, SLOT(ui->pBtnSaveMarkersClicked()));
-//    connect(ui->pBtnLoadMarkers, SIGNAL(clicked()), this, SLOT(ui->pBtnLoadMarkersClicked()));
-//    connect(pBtnZoomIn, SIGNAL(clicked()), this, SLOT(pBtnZoomInClicked()));
-//    connect(pBtnZoomOut, SIGNAL(clicked()), this, SLOT(pBtnZoomOutClicked()));
-//    connect(pBtnRemoveMark, SIGNAL(clicked()), this, SLOT(pBtnRemoveMarkClicked()));
-//    connect(pBtnPlay, SIGNAL(clicked()), this, SLOT(pBtnPlayClicked()));
-//    connect(pBtnStop, SIGNAL(clicked()), this, SLOT(pBtnStopClicked()));
-//    connect(sBarPlotScroller, SIGNAL(valueChanged(int)), this, SLOT(sBarPlotScrollerValueChanged(int)));
-//    connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
-//    connect(graphArea, SIGNAL(precalculatedArraysReady()), this, SLOT(drawPrecalculatedArray()));
+    connect(graphArea, SIGNAL(stepsOfPrecalculation(int)), this, SLOT(prBarOpenWavProgressChangeValue(int)));
+    connect(graphArea, SIGNAL(precalculatedArraysReady()), this, SLOT(drawPrecalculatedArray()));
 
     qRegisterMetaType<wavReaderErrCode>();
 }
@@ -143,16 +64,16 @@ void MainWindow::sBarPlotScrollerValueChanged(int value)
     graphArea->updatePlot();
 }
 
-void MainWindow::prBarOpenWavProgressValueChanged(int value)
+void MainWindow::prBarOpenWavProgressChangeValue(int value)
 {
-    prBarOpenWavProgress->setValue(value);
+    ui->prBarOpenWavProgress->setValue(value);
 }
 
 void MainWindow::prBarOpenWavProgressMaxValueChanged(int value)
 {
-    prBarOpenWavProgress->setMinimum(0);
-    prBarOpenWavProgress->setMaximum(value-1);
-    prBarOpenWavProgress->setValue(0);
+    ui->prBarOpenWavProgress->setMinimum(0);
+    ui->prBarOpenWavProgress->setMaximum(value-1);
+    ui->prBarOpenWavProgress->setValue(0);
 }
 
 void MainWindow::graphAreaMarkerPositionChanged(int newPosition)
@@ -176,14 +97,14 @@ void MainWindow::edMarkerPositionTextEdited(const QString &newText)
         // Set normal color:
         ui->edMarkerPosition->setStyleSheet("QLineEdit{background: white;}");
         // Unlock "Place marker button"
-        pBtnPlaceMark->setEnabled(true);
+        ui->pBtnPlaceMark->setEnabled(true);
         markerPosition = uIntMarkerPosition;
         graphArea->updatePlot();
     }
     else {
         // Change color to disturbingly red:
         ui->edMarkerPosition->setStyleSheet("QLineEdit{background: red;}");
-        pBtnPlaceMark->setEnabled(false);
+        ui->pBtnPlaceMark->setEnabled(false);
     }
 }
 
@@ -198,11 +119,11 @@ void MainWindow::pBtnPlaceMarkClicked()
         vectLabels.insert(i-1, currentIntervalLabel);
         vectLabels.insert(i, currentIntervalLabel);
         vectMarks.insert(i, markerPosition);
-        cBxIntervals->removeItem(i-1);
-        cBxIntervals->insertItem(i-1, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
-        cBxIntervals->insertItem(i, QString::number(vectMarks.data()[i]) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i+1]));
-        cBxIntervals->setCurrentIndex(i-1);
-        pBtnRemoveMark->setEnabled(true);
+        ui->cBxIntervals->removeItem(i-1);
+        ui->cBxIntervals->insertItem(i-1, QString::number(i==0? 0:vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
+        ui->cBxIntervals->insertItem(i, QString::number(vectMarks.data()[i]) + "-" + QString::number(i==vectMarks.length()? vectSamples.length()-1:vectMarks.data()[i+1]));
+        ui->cBxIntervals->setCurrentIndex(i-1);
+        ui->pBtnRemoveMark->setEnabled(true);
     }
 }
 
@@ -213,18 +134,18 @@ void MainWindow::pBtnRemoveMarkClicked()
         QString currentIntervalLabel = vectLabels.data()[i-1];
         vectLabels.remove(i);
         vectMarks.remove(i);
-        cBxIntervals->removeItem(i-1);
-        cBxIntervals->removeItem(i-1);
-        cBxIntervals->insertItem(i-1, QString::number(vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
+        ui->cBxIntervals->removeItem(i-1);
+        ui->cBxIntervals->removeItem(i-1);
+        ui->cBxIntervals->insertItem(i-1, QString::number(vectMarks.data()[i-1]) + "-" + QString::number(vectMarks.data()[i]));
     }
     // We can't remove 2 fundamental marks (the beginning and the end):
     if(vectMarks.length() == 2)
-        pBtnRemoveMark->setEnabled(false);
+        ui->pBtnRemoveMark->setEnabled(false);
 }
 
 void MainWindow::cBxMarkTypeCurrentIndexChanged(const QString & text)
 {
-    int currInterval = cBxIntervals->currentIndex();
+    int currInterval = ui->cBxIntervals->currentIndex();
     vectLabels[currInterval] = text;
     graphArea->updatePlot();
 }
@@ -232,7 +153,7 @@ void MainWindow::cBxMarkTypeCurrentIndexChanged(const QString & text)
 void MainWindow::cBxIntervalsCurrentIndexChanged(int index)
 {
     if(index != -1) {
-        cBxMarkType->setCurrentIndex(cBxMarkType->findText(vectLabels[index]));
+        ui->cBxMarkType->setCurrentIndex(ui->cBxMarkType->findText(vectLabels[index]));
         graphArea->setSelectedInterval(index);
         graphArea->updatePlot();
     }
@@ -279,12 +200,12 @@ void MainWindow::pBtnLoadMarkersClicked()
         else {
             if(labelsFile.open(QIODevice::ReadOnly)) {
                 // Block signals from cBxIntervals and edMarkerPosition to prevent excessive updates of graphArea:
-                cBxIntervals->blockSignals(true);
+                ui->cBxIntervals->blockSignals(true);
                 ui->edMarkerPosition->blockSignals(true);
                 // Clear all marks and labels:
                 vectMarks.clear();
                 vectLabels.clear();
-                cBxIntervals->clear();
+                ui->cBxIntervals->clear();
                 int tmp_mark = 0;
                 QString tmp_label;
                 QTextStream infile(&labelsFile);
@@ -297,18 +218,18 @@ void MainWindow::pBtnLoadMarkersClicked()
                 }
                 // Fill in intervals list with newly read marks:
                 for(int i=0; i < vectLabels.length(); i++) {
-                    cBxIntervals->addItem(QString::number(vectMarks[i]) + "-" + QString::number(vectMarks[i+1]));
+                    ui->cBxIntervals->addItem(QString::number(vectMarks[i]) + "-" + QString::number(vectMarks[i+1]));
                 }
                 markerPosition = 0;
                 ui->edMarkerPosition->setText(QString::number(markerPosition));
                 // Unblock signals emission and force update of graphArea:
-                cBxIntervals->blockSignals(false);
+                ui->cBxIntervals->blockSignals(false);
                 ui->edMarkerPosition->blockSignals(false);
                 // --
                 graphArea->setSelectedInterval(0);
                 graphArea->updatePlot();
                 if(vectMarks.length() > 2)
-                    pBtnRemoveMark->setEnabled(true);
+                    ui->pBtnRemoveMark->setEnabled(true);
                 labelsFile.close();
             }
             else {
@@ -334,11 +255,11 @@ void MainWindow::pBtnZoomInClicked()
     visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
     // Set new parameters for scroller:
-    sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
-    sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
-    sBarPlotScroller->setValue(leftVisibleBorder);
-    sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
-    sBarPlotScroller->blockSignals(false);
+    ui->sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
+    ui->sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
+    ui->sBarPlotScroller->setValue(leftVisibleBorder);
+    ui->sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
+    ui->sBarPlotScroller->blockSignals(false);
     graphArea->updatePlot();
 }
 
@@ -358,18 +279,18 @@ void MainWindow::pBtnZoomOutClicked()
     visibleSamplesCnt = rightVisibleBorder - leftVisibleBorder + 1;
     graphArea->setVisibleBorders(leftVisibleBorder, rightVisibleBorder);
     // Set new parameters for scroller:
-    sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
-    sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
-    sBarPlotScroller->setValue(leftVisibleBorder);
-    sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
-    sBarPlotScroller->blockSignals(false);
+    ui->sBarPlotScroller->blockSignals(true);   // Block signal emission to prevent repetitive actions
+    ui->sBarPlotScroller->setMaximum(vectSamples.length() - visibleSamplesCnt);
+    ui->sBarPlotScroller->setValue(leftVisibleBorder);
+    ui->sBarPlotScroller->setSingleStep(qFloor(static_cast<double>(wavFileHeader.sampleRate)*0.01));
+    ui->sBarPlotScroller->blockSignals(false);
     graphArea->updatePlot();
 }
 
 void MainWindow::pBtnPlayClicked()
 {
-    pBtnStop->setEnabled(true);
-    pBtnPlay->setEnabled(false);
+    ui->pBtnStop->setEnabled(true);
+    ui->pBtnPlay->setEnabled(false);
     int byteOffset = markerPosition*wavFileHeader.bitsPerSample/8;
     startPlayback(byteOffset);
 }
@@ -380,16 +301,16 @@ void MainWindow::AudioOutputStateChanged(QAudio::State newState)
             case QAudio::IdleState:
                 // Finished playing (no more data)
                 audio->stop();
-                pBtnPlay->setEnabled(true);
-                pBtnStop->setEnabled(false);
+                ui->pBtnPlay->setEnabled(true);
+                ui->pBtnStop->setEnabled(false);
                 break;
 
             case QAudio::StoppedState:
                 // Stopped for other reasons
                 if (audio->error() != QAudio::NoError) {
                     // Error handling
-                    pBtnStop->setEnabled(false);
-                    pBtnPlay->setEnabled(true);
+                    ui->pBtnStop->setEnabled(false);
+                    ui->pBtnPlay->setEnabled(true);
                     QMessageBox::critical(this, "SpeechMarker Error", "Some nasty error occured while playback.");
                 }
 
@@ -404,8 +325,8 @@ void MainWindow::AudioOutputStateChanged(QAudio::State newState)
 
 void MainWindow::pBtnStopClicked()
 {
-    pBtnStop->setEnabled(false);
-    pBtnPlay->setEnabled(true);
+    ui->pBtnStop->setEnabled(false);
+    ui->pBtnPlay->setEnabled(true);
     audio->stop();
 }
 
@@ -413,7 +334,7 @@ void MainWindow::audioNotifyProcess()
 {
     markerPosition += audio->notifyInterval()*wavFileHeader.sampleRate/1000;
     if(markerPosition>graphArea->getRightVisibleBorder())
-        sBarPlotScroller->setValue(sBarPlotScroller->value() + 0.1*wavFileHeader.sampleRate);
+        ui->sBarPlotScroller->setValue(ui->sBarPlotScroller->value() + 0.1*wavFileHeader.sampleRate);
     else
         graphArea->updatePlot();
 }
@@ -468,7 +389,7 @@ void MainWindow::pBtnLoadWavClicked()
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(new_thread, SIGNAL(finished()), new_thread, SLOT(deleteLater()));
     connect(worker, SIGNAL(processResult(wavReaderErrCode, QString)), this, SLOT(processWavReaderResult(wavReaderErrCode, QString)));
-    connect(worker, SIGNAL(bytesAlreadyRead(int)), this, SLOT(prBarOpenWavProgressValueChanged(int)));
+    connect(worker, SIGNAL(bytesAlreadyRead(int)), this, SLOT(prBarOpenWavProgressChangeValue(int)));
     connect(worker, SIGNAL(samplesInWavToRead(int)), this, SLOT(prBarOpenWavProgressMaxValueChanged(int)));
     new_thread->start();
 }
@@ -493,9 +414,9 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         break;
     case READSUCC:
         visibleSamplesCnt = vectSamples.length();
-        prBarOpenWavProgress->setMinimum(0);
-        prBarOpenWavProgress->setMaximum(8);
-        prBarOpenWavProgress->setValue(0);
+        ui->prBarOpenWavProgress->setMinimum(0);
+        ui->prBarOpenWavProgress->setMaximum(8);
+        ui->prBarOpenWavProgress->setValue(0);
         graphArea->setVisibleBorders(0, vectSamples.length()-1);
         graphArea->setState(INACTIVE, "Precalculating waveforms for visualization...");
         //-------
@@ -506,10 +427,10 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         graphArea->setSampleMaxValue(static_cast<unsigned int>(qPow(2, wavFileHeader.bitsPerSample-1)));
         // Block signals from ui->edMarkerPosition and cBxIntervals to prevent excessive updates of graphArea:
         ui->edMarkerPosition->blockSignals(true);
-        cBxIntervals->blockSignals(true);
+        ui->cBxIntervals->blockSignals(true);
         ui->edWavFileSamplRate->setText(QString::number(wavFileHeader.sampleRate));
-        edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
-        edSamplesInWav->setText(QString::number(vectSamples.length()));
+        ui->edWavFileBitsPerSample->setText(QString::number(wavFileHeader.bitsPerSample));
+        ui->edSamplesInWav->setText(QString::number(vectSamples.length()));
         // Add default label that covers the whole wav:
         vectLabels.clear();
         vectLabels.append(defaultLabel);
@@ -518,9 +439,9 @@ void MainWindow::processWavReaderResult(wavReaderErrCode errCode, QString wavFil
         // Add two marks, namely the first and the last sample (since we have only one label that covers the whole wav):
         vectMarks.append(0);
         vectMarks.append(vectSamples.length()-1);
-        cBxIntervals->clear();
+        ui->cBxIntervals->clear();
         // When wav file is opened we have one interval from begining to the end:
-        cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
+        ui->cBxIntervals->addItem(QString::number(vectMarks[0]) + "-" + QString::number(vectMarks[1]));
         // Initial marker position:
         markerPosition = 0;
         ui->edMarkerPosition->setText(QString::number(markerPosition));
@@ -541,15 +462,15 @@ void MainWindow::drawPrecalculatedArray()
         childWidget->setEnabled(true);
     }
     // Disable "Remove Mark" button because there are no marks yet:
-    pBtnRemoveMark->setEnabled(false);
+    ui->pBtnRemoveMark->setEnabled(false);
     // Disable "Stop" button because it must be enabled only when playback:
-    pBtnStop->setEnabled(false);
+    ui->pBtnStop->setEnabled(false);
     // ---
-    sBarPlotScroller->setMinimum(0);
-    sBarPlotScroller->setMaximum(0);
+    ui->sBarPlotScroller->setMinimum(0);
+    ui->sBarPlotScroller->setMaximum(0);
     // Unblock signals emission from ui->edMarkerPosition and cBxIntervals and force update for graphArea:
     ui->edMarkerPosition->blockSignals(false);
-    cBxIntervals->blockSignals(false);
+    ui->cBxIntervals->blockSignals(false);
     graphArea->setEnabled(true);
     graphArea->setState(ACTIVEDRAWING);
     graphArea->updatePlot();

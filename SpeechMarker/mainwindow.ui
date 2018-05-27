@@ -19,6 +19,9 @@
      <layout class="QVBoxLayout" name="vBoxLayRenderControl">
       <item>
        <widget class="QScrollBar" name="sBarPlotScroller">
+        <property name="maximum">
+         <number>0</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -58,10 +61,30 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="cBxIntervals"/>
+         <widget class="QComboBox" name="cBxIntervals">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="cBxMarkType"/>
+         <widget class="QComboBox" name="cBxMarkType">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -141,6 +164,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="edWavFileBitsPerSample">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -151,7 +177,7 @@
       <item>
        <widget class="QProgressBar" name="prBarOpenWavProgress">
         <property name="value">
-         <number>24</number>
+         <number>0</number>
         </property>
        </widget>
       </item>
@@ -163,6 +189,9 @@
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
          <widget class="QPushButton" name="pBtnPlay">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Play</string>
           </property>
@@ -170,6 +199,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pBtnStop">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Stop</string>
           </property>
@@ -199,6 +231,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="cBxWindowSize">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <item>
          <property name="text">
           <string>1 sample</string>
@@ -261,5 +296,229 @@
   </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pBtnLoadWav</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnLoadWavClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>117</x>
+     <y>294</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>353</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnPlaceMark</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnPlaceMarkClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>740</x>
+     <y>529</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>552</x>
+     <y>515</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edMarkerPosition</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>edMarkerPositionTextEdited(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>138</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cBxIntervals</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cBxIntervalsCurrentIndexChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>527</x>
+     <y>128</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>491</x>
+     <y>83</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cBxMarkType</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>cBxMarkTypeCurrentIndexChanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>622</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>687</x>
+     <y>150</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnSaveMarkers</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnSaveMarkersClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>578</x>
+     <y>294</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>633</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnLoadMarkers</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnLoadMarkersClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>392</x>
+     <y>305</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>441</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnZoomIn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnZoomInClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>680</x>
+     <y>428</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>630</x>
+     <y>403</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnZoomOut</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnZoomOutClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>772</x>
+     <y>453</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>706</x>
+     <y>379</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnRemoveMark</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnRemoveMarkClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>735</x>
+     <y>557</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>598</x>
+     <y>576</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnPlay</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnPlayClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>709</x>
+     <y>221</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>579</x>
+     <y>194</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBtnStop</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>pBtnStopClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>789</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>754</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sBarPlotScroller</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>sBarPlotScrollerValueChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>294</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>387</x>
+     <y>57</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>pBtnLoadWavClicked()</slot>
+  <slot>pBtnPlaceMarkClicked()</slot>
+  <slot>edMarkerPositionTextEdited(QString)</slot>
+  <slot>cBxIntervalsCurrentIndexChanged(int)</slot>
+  <slot>cBxMarkTypeCurrentIndexChanged(QString)</slot>
+  <slot>pBtnSaveMarkersClicked()</slot>
+  <slot>pBtnLoadMarkersClicked()</slot>
+  <slot>pBtnZoomInClicked()</slot>
+  <slot>pBtnZoomOutClicked()</slot>
+  <slot>pBtnRemoveMarkClicked()</slot>
+  <slot>pBtnPlayClicked()</slot>
+  <slot>pBtnStopClicked()</slot>
+  <slot>sBarPlotScrollerValueChanged(int)</slot>
+ </slots>
 </ui>

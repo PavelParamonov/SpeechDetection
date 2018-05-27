@@ -71,7 +71,7 @@ public slots:
     void edMarkerPositionTextEdited(const QString &newText);
     void graphAreaMarkerPositionChanged(int newPosition);
     void sBarPlotScrollerValueChanged(int value);
-    void prBarOpenWavProgressValueChanged(int value);
+    void prBarOpenWavProgressChangeValue(int value);
     void prBarOpenWavProgressMaxValueChanged(int value);
     void processWavReaderResult(wavReaderErrCode errCode, QString wavFileName);
     void drawPrecalculatedArray();
@@ -83,14 +83,6 @@ private:
     Ui::MainWindow *ui;
     // GIU members:
     RenderArea  *graphArea;
-    QPushButton *pBtnLoadWav, *pBtnSaveMarkers, *pBtnLoadMarkers, *pBtnPlaceMark, *pBtnZoomIn, *pBtnZoomOut, *pBtnRemoveMark, *pBtnPlay, *pBtnStop;
-    QComboBox   *cBxMarkType, *cBxWindowSize, *cBxIntervals;
-    QLabel      *lbCurrentWavFile, *lbWavFileSamplRate, *lbWavFileBitsPerSample, *lbMarkerPosition, *lbSamplesInWav;
-    QLineEdit   *edCurrentWavFile, *edWavFileSamplRate, *edWavFileBitsPerSample, *edMarkerPosition, *edSamplesInWav;
-    QVBoxLayout *vBoxLayMarksSettings, *vBoxLayRenderControl;
-    QHBoxLayout *hBoxLayControlButtons, *hBoxLayMarkerPosition, *hBoxLayWavFileLabel, *hBoxLayMain, *hBoxPlayStop;
-    QScrollBar  *sBarPlotScroller;
-    QProgressBar *prBarOpenWavProgress;
     // Other members:
     QVector<int>    vectSamples, vectMarks;
     QVector<QString> vectLabels;
